@@ -37,7 +37,7 @@ export const ContextualSidePanel: React.FC = () => {
   });
 
   return (
-    <aside aria-labelledby="coming-up-title" className="flex flex-col gap-space-md w-full xl:w-[320px] xl:shrink-0">
+    <aside aria-labelledby="coming-up-title" className="flex flex-col gap-space-md w-full xl:w-[320px] xl:shrink-0 min-w-0">
       {/* 1. Coming Up (Next 7 Days) */}
       <div className="rounded-xl bg-bg-surface p-space-md shadow-sm border border-border-subtle/40">
         <div className="flex items-center justify-between pb-space-sm mb-space-sm border-b border-border-subtle/30">
@@ -55,30 +55,34 @@ export const ContextualSidePanel: React.FC = () => {
         ) : (
           <div className="flex flex-col gap-space-md">
             {groupedTasks.map((group, gIdx) => (
-              <div key={gIdx} className="flex flex-col gap-space-xs">
-                <div className="flex items-center justify-between font-label-md text-label-md text-text-secondary">
-                  <span className="font-semibold text-text-primary">{group.dateLabel}</span>
-                  <span className="text-xs text-text-tertiary">
+              <div key={gIdx} className="flex flex-col gap-2">
+                {/* Group Heading: Date label & task count clearly separated */}
+                <div className="flex items-center justify-between pb-1 border-b border-border-subtle/20 font-label-md text-label-md">
+                  <span className="font-semibold text-text-primary text-xs uppercase tracking-wider">{group.dateLabel}</span>
+                  <span className="text-xs text-text-tertiary font-mono">
                     {group.items.length} {group.items.length === 1 ? 'task' : 'tasks'}
                   </span>
                 </div>
-                <div className="flex flex-col gap-1.5 pl-2">
+                {/* Item Containers with Distinct Title & Metadata Rows */}
+                <div className="flex flex-col gap-2">
                   {group.items.map((item) => (
                     <div
                       key={item.id}
-                      className="p-2 rounded-lg bg-bg-sunken/60 flex flex-col gap-0.5 hover:bg-bg-sunken transition-colors"
+                      className="p-3 rounded-lg bg-bg-sunken/60 flex flex-col gap-1.5 hover:bg-bg-sunken transition-colors border border-border-subtle/30"
                     >
-                      <span className="font-body-sm text-body-sm font-medium text-text-primary truncate">
+                      {/* Line 1: Distinct task title */}
+                      <span className="font-title-sm text-title-sm font-medium text-text-primary break-words line-clamp-2 leading-snug">
                         {item.title}
                       </span>
-                      <div className="flex items-center justify-between font-label-sm text-[11px]">
-                        <span className="text-text-tertiary font-medium">
+                      {/* Line 2: Separated Category & Due Time Metadata */}
+                      <div className="flex items-center justify-between font-label-sm text-label-sm pt-1 border-t border-border-subtle/20 text-text-tertiary">
+                        <span className="font-medium text-text-secondary truncate max-w-[160px]">
                           {item.tags?.[0] || 'COGSCI 210'}
                         </span>
                         {item.priority === 'urgent' ? (
-                          <span className="text-danger font-medium">Due at 11:59 PM</span>
+                          <span className="text-danger font-medium shrink-0 ml-2">Due at 11:59 PM</span>
                         ) : (
-                          <span className="text-text-tertiary">Due at 5:00 PM</span>
+                          <span className="text-text-tertiary shrink-0 ml-2">Due at 5:00 PM</span>
                         )}
                       </div>
                     </div>

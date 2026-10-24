@@ -140,15 +140,15 @@ export const TaskModal: React.FC<TaskModalProps> = ({
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="p-3 text-xs bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300 rounded-lg">
+          <div className="p-3 font-body-sm text-body-sm bg-danger-bg text-danger border border-danger/30 rounded-xl">
             {error}
           </div>
         )}
 
         {/* Task Title */}
         <div>
-          <label htmlFor="task-title" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-            Task Title <span className="text-red-500">*</span>
+          <label htmlFor="task-title" className="block font-label-md text-label-md font-semibold text-text-secondary mb-1.5">
+            Task Title <span className="text-danger">*</span>
           </label>
           <input
             id="task-title"
@@ -161,13 +161,14 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               setTitle(e.target.value);
               if (error) setError(null);
             }}
-            className="w-full text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+            className="w-full font-body-md text-body-md px-3.5 py-2.5 rounded-xl border border-border-strong/40 bg-bg-sunken text-text-primary placeholder:text-text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:bg-white transition-all shadow-2xs"
+            style={{ backgroundColor: '#EAEFED' }}
           />
         </div>
 
         {/* Description */}
         <div>
-          <label htmlFor="task-desc" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          <label htmlFor="task-desc" className="block font-label-md text-label-md font-semibold text-text-secondary mb-1.5">
             Description / Context (Optional)
           </label>
           <textarea
@@ -177,21 +178,23 @@ export const TaskModal: React.FC<TaskModalProps> = ({
             placeholder="Add any helpful instructions, rubric requirements, or links..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full text-xs sm:text-sm px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 resize-none"
+            className="w-full font-body-md text-body-md px-3.5 py-2 rounded-xl border border-border-strong/40 bg-bg-sunken text-text-primary placeholder:text-text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:bg-white resize-none transition-all shadow-2xs"
+            style={{ backgroundColor: '#EAEFED' }}
           />
         </div>
 
         {/* Priority & Due Date Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label htmlFor="task-priority" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label htmlFor="task-priority" className="block font-label-md text-label-md font-semibold text-text-secondary mb-1.5">
               Priority Tier
             </label>
             <select
               id="task-priority"
               value={priority}
               onChange={(e) => setPriority(e.target.value as TaskPriority)}
-              className="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+              className="w-full font-body-md text-body-md px-3 py-2 rounded-xl border border-border-strong/40 bg-white text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand shadow-2xs cursor-pointer"
+              style={{ backgroundColor: '#FFFFFF' }}
             >
               <option value="urgent">Urgent (Immediate deadline)</option>
               <option value="high">High priority</option>
@@ -201,7 +204,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           <div>
-            <label htmlFor="task-due-date" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label htmlFor="task-due-date" className="block font-label-md text-label-md font-semibold text-text-secondary mb-1.5">
               Due Date (Optional)
             </label>
             <input
@@ -209,37 +212,38 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
-              className="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+              className="w-full font-body-md text-body-md px-3 py-2 rounded-xl border border-border-strong/40 bg-white text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand shadow-2xs cursor-pointer"
+              style={{ backgroundColor: '#FFFFFF' }}
             />
           </div>
         </div>
 
-        {/* Focus Pin Checkbox */}
-        <div className="flex items-center gap-2 pt-1">
+        {/* Focus Pin Checkbox (Consistent Dedicated Container) */}
+        <div className="flex items-center gap-2.5 p-3 rounded-xl bg-bg-sunken border border-border-subtle/50" style={{ backgroundColor: '#EAEFED' }}>
           <input
             id="focus-pinned-check"
             type="checkbox"
             checked={isFocusPinned}
             onChange={(e) => setIsFocusPinned(e.target.checked)}
-            className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300 dark:border-slate-700"
+            className="w-4 h-4 rounded text-brand accent-brand focus:ring-brand border-border-strong cursor-pointer"
           />
-          <label htmlFor="focus-pinned-check" className="text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1 cursor-pointer">
-            <Pin className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+          <label htmlFor="focus-pinned-check" className="font-label-md text-label-md font-medium text-text-primary flex items-center gap-1.5 cursor-pointer select-none">
+            <Pin className="w-3.5 h-3.5 text-accent fill-accent" />
             <span>Pin as my primary focus task (gives highest priority in Next Best Action)</span>
           </label>
         </div>
 
         {/* Subtask Deconstruction Section */}
-        <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+        <div className="pt-4 border-t border-border-subtle/40 mt-1">
           <div className="flex items-center justify-between mb-2">
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+            <label className="font-label-md text-label-md font-semibold text-text-primary flex items-center gap-1.5">
               <span>Subtasks & Micro-Steps</span>
-              <span className="text-[11px] font-normal text-slate-500">({subtasks.length} steps)</span>
+              <span className="font-label-sm text-label-sm font-normal text-text-tertiary">({subtasks.length} steps)</span>
             </label>
 
             {/* Quick Template Selector */}
             <div className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <Sparkles className="w-3.5 h-3.5 text-brand" />
               <select
                 onChange={(e) => {
                   if (e.target.value) {
@@ -248,7 +252,8 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                   }
                 }}
                 defaultValue=""
-                className="text-[11px] px-2 py-1 rounded-lg border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950 text-blue-800 dark:text-blue-300 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 cursor-pointer"
+                className="font-label-sm text-label-sm px-2.5 py-1 rounded-lg border border-brand/30 bg-brand-tint text-brand-strong font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand cursor-pointer"
+                style={{ backgroundColor: '#DCEFEC' }}
               >
                 <option value="" disabled>
                   Apply Breakdown Template...
@@ -263,22 +268,23 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           {/* Subtask List */}
-          <div className="space-y-1.5 max-h-40 overflow-y-auto mb-2 pr-1">
+          <div className="space-y-2 max-h-40 overflow-y-auto mb-2 pr-1">
             {subtasks.map((st, idx) => (
               <div
                 key={idx}
-                className="flex items-center justify-between gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 text-xs"
+                className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-bg-sunken border border-border-subtle/50 font-body-sm text-body-sm"
+                style={{ backgroundColor: '#EAEFED' }}
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="w-4 h-4 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 text-[10px] flex items-center justify-center font-mono shrink-0">
+                  <span className="w-4 h-4 rounded-full bg-border-subtle text-text-secondary font-label-sm text-[10px] flex items-center justify-center font-mono shrink-0">
                     {idx + 1}
                   </span>
-                  <span className="truncate text-slate-800 dark:text-slate-200">{st}</span>
+                  <span className="break-words text-text-primary font-medium">{st}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleRemoveSubtask(idx)}
-                  className="p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded"
+                  className="p-1 text-text-tertiary hover:text-danger rounded cursor-pointer transition-colors"
                   aria-label={`Remove step ${idx + 1}`}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -300,7 +306,8 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                   handleAddSubtask(e);
                 }
               }}
-              className="flex-1 text-xs px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+              className="flex-1 font-body-sm text-body-sm px-3 py-2 rounded-lg border border-border-strong/40 bg-bg-sunken text-text-primary placeholder:text-text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:bg-white"
+              style={{ backgroundColor: '#EAEFED' }}
             />
             <Button
               type="button"
@@ -317,20 +324,21 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 
         {/* Tags Row */}
         <div>
-          <label htmlFor="task-tags" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          <label htmlFor="task-tags" className="block font-label-md text-label-md font-semibold text-text-secondary mb-1.5">
             Tags (Press Enter to add)
           </label>
-          <div className="flex flex-wrap items-center gap-1.5 p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+          <div className="flex flex-wrap items-center gap-1.5 p-2 rounded-xl border border-border-strong/40 bg-bg-sunken" style={{ backgroundColor: '#EAEFED' }}>
             {tags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200"
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-label-sm text-label-sm bg-white text-text-secondary border border-border-subtle shadow-2xs"
+                style={{ backgroundColor: '#FFFFFF' }}
               >
                 <span>#{tag}</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveTag(tag)}
-                  className="hover:text-red-500 rounded p-0.5"
+                  className="hover:text-danger rounded p-0.5 cursor-pointer"
                   aria-label={`Remove tag ${tag}`}
                 >
                   ×
@@ -344,13 +352,16 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={handleAddTag}
-              className="flex-1 text-xs bg-transparent text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none min-w-[120px]"
+              className="flex-1 font-body-sm text-body-sm bg-transparent text-text-primary placeholder:text-text-tertiary focus:outline-none min-w-[120px]"
             />
           </div>
         </div>
 
-        {/* Modal Action Buttons */}
-        <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100 dark:border-slate-800">
+        {/* Modal Action Buttons - Pinned Sticky Footer with Solid Background */}
+        <div
+          className="sticky -bottom-5 flex items-center justify-end gap-2.5 py-3 -mx-5 px-5 border-t border-border-subtle bg-white shrink-0 z-10"
+          style={{ backgroundColor: '#FFFFFF' }}
+        >
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancel
           </Button>

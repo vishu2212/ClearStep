@@ -95,8 +95,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
               </div>
               <div className="flex flex-col leading-none">
-                <span className="font-headline-sm text-[18px] text-white tracking-tight font-semibold">ClearStep</span>
-                <span className="font-label-sm text-[11px] text-slate-300/80 font-medium mt-[3px]">Student Studio</span>
+                <span className="font-headline-sm text-headline-sm text-white tracking-tight font-semibold">ClearStep</span>
+                <span className="font-label-sm text-label-sm text-slate-300/80 font-medium mt-[3px]">Student Studio</span>
               </div>
             </button>
             {/* Close button on mobile */}
@@ -124,7 +124,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     onCloseMobile?.();
                   }}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`group relative flex items-center h-[44px] px-4 rounded-[10px] transition-colors w-full text-left font-body-md text-[14px] cursor-pointer ${
+                  className={`group relative flex items-center h-[44px] px-4 rounded-[10px] transition-colors w-full text-left font-body-md text-body-md cursor-pointer ${
                     isActive
                       ? 'bg-brand/50 text-white font-semibold'
                       : 'text-slate-300/80 hover:text-white hover:bg-brand/20 font-medium'
@@ -154,8 +154,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <Database className="w-4 h-4 text-slate-300/70 group-hover:text-white shrink-0" />
             <div className="flex flex-col">
-              <span className="font-label-sm text-[11px] font-medium text-white/90">Stored on this device</span>
-              <span className="font-label-sm text-[10px] text-slate-400 leading-none mt-0.5">Local-first studio</span>
+              <span className="font-label-sm text-label-sm font-medium text-white/90">Stored on this device</span>
+              <span className="font-label-sm text-label-sm text-slate-400 leading-none mt-0.5">Local-first studio</span>
             </div>
           </button>
         </div>

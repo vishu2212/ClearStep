@@ -57,8 +57,8 @@ Students and overwhelmed individuals face a recurring barrier: **executive dysfu
 
 ```powershell
 # 1. Clone repository
-git clone https://github.com/sickn33/TaskForge.git
-cd TaskForge
+git clone https://github.com/vishu2212/ClearStep.git
+cd ClearStep
 
 # 2. Install dependencies
 npm install

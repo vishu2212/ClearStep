@@ -17,6 +17,30 @@
   }
 }
 
+/* =========================================================================
+   Global Modal, Dialog, and Overlay Opacity Protections
+   Ensures that modal surfaces, dialogs, and overlays are 100% solid/opaque
+   without background bleed-through or affecting legitimate dark surfaces.
+   ========================================================================= */
+
+.modal-surface,
+.dialog-surface {
+  background-color: #FFFFFF !important;
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Ensure native dialogs and role="dialog" modal cards default to solid surface */
+dialog,
+[role="dialog"] > .modal-surface {
+  background-color: #FFFFFF !important;
+}
+
+/* Standard select option dropdown opacity guarantee */
+select option {
+  background-color: #FFFFFF;
+  color: #14201F;
+}
+
 /* Accessibility: High contrast visible focus mode */
 .high-contrast-focus :focus-visible {
   outline: 3px solid #2563eb !important;

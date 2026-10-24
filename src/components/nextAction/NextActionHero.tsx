@@ -98,84 +98,84 @@ export const NextActionHero: React.FC<NextActionHeroProps> = ({
         <div className="absolute bottom-4 left-0 w-[8px] h-[8px] bg-accent rounded-r-[2px]"></div>
       </div>
 
-      <div className="flex flex-col lg:flex-row justify-between items-start gap-space-lg pl-space-xs">
+      <div className="flex flex-col 2xl:flex-row justify-between items-start gap-space-lg pl-space-xs min-w-0 w-full">
         {/* Dominant Left Content Area */}
-        <div className="flex flex-col max-w-[620px] min-w-0 w-full">
-          {/* Overline tag */}
-          <div className="flex items-center gap-space-sm mb-space-sm">
+        <div className="flex flex-col w-full min-w-0 max-w-full 2xl:max-w-[640px]">
+          {/* Level 1: Small Overline & Proximity Badge */}
+          <div className="flex items-center gap-space-sm mb-2.5">
             <span
               className="font-label-sm text-label-sm tracking-wider uppercase text-outline-variant font-semibold flex items-center gap-1"
               id="hero-action-heading"
             >
-              <span>Your Next Step</span>
+              <span>YOUR NEXT STEP</span>
               <span className="sr-only">Next Best Action</span>
             </span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-brand-strong/80 text-brand-tint font-label-sm font-medium">
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-brand-strong/80 text-brand-tint font-label-sm font-medium tracking-wide">
               Highest Proximity
             </span>
           </div>
 
-          {/* Task Title with Course Badge */}
-          <div className="flex flex-col gap-1.5 mb-space-sm">
-            <span className="font-label-md text-label-md text-primary-fixed-dim font-medium tracking-wide">
-              {courseTag}
-            </span>
-            <h2 className="font-headline-lg text-headline-lg text-brand-on leading-tight break-words font-semibold">
-              {recommendedTask.title}
-            </h2>
-          </div>
+          {/* Level 2: Course / Category Tag */}
+          <span className="font-label-md text-label-md text-primary-fixed-dim font-medium tracking-wide mb-1.5 block">
+            {courseTag}
+          </span>
 
-          {/* Task Context Metadata Badges */}
-          <div className="flex flex-wrap items-center gap-y-2 gap-x-space-md text-outline-variant font-body-sm text-body-sm mb-space-lg">
+          {/* Level 3: Prominent Task Title Headline */}
+          <h2 className="font-headline-lg text-headline-lg text-brand-on leading-tight break-words font-semibold mb-3">
+            {recommendedTask.title}
+          </h2>
+
+          {/* Level 4: Compact Metadata Row */}
+          <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-outline-variant font-body-sm text-body-sm mb-4">
             <div className="flex items-center gap-1.5 text-accent font-medium">
-              <Clock className="w-4 h-4 text-accent" />
+              <Clock className="w-4 h-4 text-accent shrink-0" />
               <span>{deadlineText}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <AlertCircle className="w-4 h-4 text-tertiary-fixed-dim" />
+              <AlertCircle className="w-4 h-4 text-tertiary-fixed-dim shrink-0" />
               <span className="capitalize">{recommendedTask.priority} Priority</span>
             </div>
             {recommendedTask.subtasks.length > 0 && (
               <div className="flex items-center gap-1.5">
-                <CheckSquare className="w-4 h-4" />
+                <CheckSquare className="w-4 h-4 shrink-0" />
                 <span>{remainingSubtasks} subtasks left</span>
               </div>
             )}
           </div>
 
-          {/* Deterministic "Why this task" Rationale Panel */}
-          <div className="bg-brand-strong/60 rounded-xl p-space-md mb-space-lg border border-brand/20">
-            <div className="flex items-center gap-1.5 text-primary-fixed-dim font-label-sm text-label-sm uppercase tracking-wide mb-space-xs font-semibold">
+          {/* Level 5: Deterministic "Why this task" Rationale Panel */}
+          <div className="bg-brand-strong/60 rounded-xl p-4 sm:p-5 mb-5 border border-brand/20">
+            <div className="flex items-center gap-1.5 text-primary-fixed-dim font-label-sm text-label-sm uppercase tracking-wide mb-3 font-semibold">
               <Brain className="w-4 h-4 text-primary-fixed-dim shrink-0" />
               <span>Deterministic System Rationale</span>
             </div>
-            <ul className="space-y-1.5 font-body-sm text-body-sm text-surface-dim">
+            <ul className="space-y-2 font-body-sm text-body-sm text-surface-dim">
               {rationaleBullets.map((bullet, idx) => (
-                <li key={idx} className="flex items-start gap-2">
+                <li key={idx} className="flex items-start gap-2.5">
                   <Check className="w-4 h-4 text-accent mt-0.5 shrink-0" />
-                  <span className="leading-snug">{bullet}</span>
+                  <span className="leading-relaxed">{bullet}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Action Buttons Footer */}
-          <div className="flex flex-wrap items-center gap-space-sm sm:gap-space-md">
+          {/* Level 6: Action Deck */}
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             <button
-              className="h-[52px] px-space-lg sm:px-space-xl rounded-xl bg-accent text-accent-on font-label-md sm:text-headline-sm font-semibold flex items-center gap-space-sm hover:brightness-105 active:translate-y-[1px] transition-all cursor-pointer shadow-md select-none"
+              className="h-[48px] sm:h-[52px] px-5 sm:px-6 rounded-xl bg-accent text-accent-on font-title-sm sm:font-title-md font-semibold inline-flex items-center justify-center gap-2 hover:brightness-105 active:translate-y-[1px] transition-all cursor-pointer shadow-md select-none"
               onClick={() => onStartFocus(recommendedTask.id, recommendedTask.title)}
               type="button"
             >
-              <Play className="w-5 h-5 fill-current" />
+              <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
               <span>Start focus (35 min)</span>
-              <span className="text-xs px-1.5 py-0.5 rounded bg-accent-on/15 font-mono ml-1 font-normal tracking-normal">
+              <span className="text-xs px-1.5 py-0.5 rounded bg-accent-on/15 font-mono ml-0.5 font-normal tracking-normal">
                 [Space]
               </span>
             </button>
 
             <button
               onClick={() => onEditTask(recommendedTask.id)}
-              className="h-[44px] px-space-md rounded-xl text-brand-tint hover:text-surface-bright hover:bg-brand/40 transition-colors flex items-center gap-1.5 cursor-pointer font-label-md text-label-md"
+              className="h-[44px] px-4 rounded-xl text-brand-tint hover:text-surface-bright hover:bg-brand/40 transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer font-label-md text-label-md font-medium"
               type="button"
             >
               <Maximize2 className="w-4 h-4" />
@@ -184,7 +184,7 @@ export const NextActionHero: React.FC<NextActionHeroProps> = ({
 
             <button
               onClick={() => onEditTask(recommendedTask.id)}
-              className="h-[44px] px-space-md rounded-xl text-outline-variant hover:text-surface-bright hover:bg-brand/30 transition-colors flex items-center gap-1.5 cursor-pointer font-label-md text-label-md"
+              className="h-[44px] px-4 rounded-xl text-outline-variant hover:text-surface-bright hover:bg-brand/30 transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer font-label-md text-label-md font-medium"
               type="button"
             >
               <Split className="w-4 h-4" />
@@ -193,8 +193,8 @@ export const NextActionHero: React.FC<NextActionHeroProps> = ({
           </div>
         </div>
 
-        {/* Calm Right Negative / Visual Balance Zone */}
-        <div className="hidden lg:flex flex-col items-end justify-between self-stretch py-space-xs text-right shrink-0">
+        {/* Level 7: Calm Right Negative / Visual Balance Zone (Engine status placed safely away) */}
+        <div className="hidden 2xl:flex flex-col items-end justify-between self-stretch py-1 text-right shrink-0">
           <div className="w-16 h-16 rounded-2xl bg-brand/30 flex items-center justify-center text-primary-fixed-dim/40">
             <Focus className="w-9 h-9" />
           </div>

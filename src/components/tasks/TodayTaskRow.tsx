@@ -56,17 +56,17 @@ export const TodayTaskRow: React.FC<TodayTaskRowProps> = ({
         </label>
 
         {/* Content and metadata */}
-        <div className={`flex flex-col min-w-0 ${task.completed ? 'opacity-75' : ''}`}>
-          <span className={`font-body-md text-body-md font-semibold truncate ${task.completed ? 'text-text-secondary line-through' : 'text-text-primary'}`}>
+        <div className={`flex flex-col min-w-0 flex-1 ${task.completed ? 'opacity-75' : ''}`}>
+          <span className={`font-body-md text-body-md font-semibold break-words ${task.completed ? 'text-text-secondary line-through' : 'text-text-primary'}`}>
             {task.title}
           </span>
 
-          <div className="flex flex-wrap items-center gap-y-1 gap-x-space-sm text-text-secondary font-body-sm text-body-sm mt-0.5">
+          <div className="flex flex-wrap items-center gap-y-1 gap-x-2 text-text-secondary font-label-sm text-label-sm mt-1">
             <span className="font-medium text-text-primary">{courseTag}</span>
 
             {isOverdue && (
               <>
-                <span className="text-text-tertiary">•</span>
+                <span className="text-text-tertiary/60 select-none">•</span>
                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-danger-bg text-danger font-label-sm text-label-sm font-medium">
                   <AlertTriangle className="w-3.5 h-3.5" />
                   Overdue • 1 day
@@ -76,7 +76,7 @@ export const TodayTaskRow: React.FC<TodayTaskRowProps> = ({
 
             {isDueToday && (
               <>
-                <span className="text-text-tertiary">•</span>
+                <span className="text-text-tertiary/60 select-none">•</span>
                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-warning-bg text-warning font-label-sm text-label-sm font-medium">
                   <Clock className="w-3.5 h-3.5" />
                   Due today • 5:00 PM
@@ -86,22 +86,22 @@ export const TodayTaskRow: React.FC<TodayTaskRowProps> = ({
 
             {!isOverdue && !isDueToday && task.dueDate && (
               <>
-                <span className="text-text-tertiary">•</span>
-                <span className="text-text-secondary font-label-sm text-label-sm">
+                <span className="text-text-tertiary/60 select-none">•</span>
+                <span className="text-text-tertiary font-label-sm text-label-sm">
                   Due {task.dueDate}
                 </span>
               </>
             )}
 
-            <span className="text-text-tertiary">•</span>
-            <span className="inline-flex items-center gap-1 text-tertiary font-label-sm text-label-sm capitalize">
+            <span className="text-text-tertiary/60 select-none">•</span>
+            <span className="inline-flex items-center gap-1 text-text-tertiary font-label-sm text-label-sm capitalize">
               <Flag className="w-3.5 h-3.5" />
               {task.priority} Priority
             </span>
 
             {task.subtasks.length > 0 && (
               <>
-                <span className="text-text-tertiary">•</span>
+                <span className="text-text-tertiary/60 select-none">•</span>
                 <span className="text-text-tertiary font-label-sm text-label-sm">
                   {completedSubtasks} of {task.subtasks.length} subtasks
                 </span>
@@ -112,11 +112,11 @@ export const TodayTaskRow: React.FC<TodayTaskRowProps> = ({
       </div>
 
       {/* Trailing Action Controls */}
-      <div className="flex items-center gap-space-xs shrink-0">
+      <div className="flex items-center gap-space-xs shrink-0 ml-2">
         {!task.completed ? (
           <button
             onClick={() => onStartFocus(task.id, task.title)}
-            className="hidden sm:inline-flex items-center gap-1 h-[36px] px-space-sm rounded-lg bg-bg-sunken text-brand-strong hover:bg-brand-tint transition-colors text-label-md font-medium cursor-pointer"
+            className="hidden sm:inline-flex items-center justify-center gap-1 h-[36px] px-space-sm rounded-lg bg-bg-sunken text-brand-strong hover:bg-brand-tint transition-colors font-label-md text-label-md font-medium cursor-pointer"
             type="button"
           >
             <Play className="w-3.5 h-3.5 fill-current" />

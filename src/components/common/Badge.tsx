@@ -14,16 +14,16 @@ export const Badge: React.FC<BadgeProps> = ({
   size = 'md',
   className = '',
 }) => {
-  const sizeStyles = size === 'sm' ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs';
+  const sizeStyles = size === 'sm' ? 'font-label-sm text-label-sm px-2 py-0.5' : 'font-label-md text-label-md px-2.5 py-1';
 
   const variantStyles = {
-    default: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
-    urgent: 'bg-red-100 text-red-800 dark:bg-red-950/70 dark:text-red-300 font-semibold border border-red-200 dark:border-red-900',
-    high: 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 font-medium border border-amber-200 dark:border-amber-900',
-    medium: 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300',
-    low: 'bg-slate-100 text-slate-600 dark:bg-slate-800/80 dark:text-slate-400',
-    success: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800',
-    outline: 'border border-slate-300 text-slate-700 dark:border-slate-700 dark:text-slate-300 bg-transparent',
+    default: 'bg-bg-sunken text-text-secondary',
+    urgent: 'bg-danger-bg text-danger font-semibold border border-danger/30',
+    high: 'bg-warning-bg text-warning font-medium border border-warning/30',
+    medium: 'bg-brand-tint text-brand-strong font-medium',
+    low: 'bg-bg-sunken text-text-tertiary',
+    success: 'bg-success-bg text-success border border-success/30 font-medium',
+    outline: 'border border-border-subtle/40 text-text-secondary bg-transparent',
   };
 
   return (

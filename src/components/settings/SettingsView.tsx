@@ -67,14 +67,15 @@ export const SettingsView: React.FC = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-6 sm:py-8 px-4 space-y-6">
+    <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-          <Settings className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-          <span>Preferences & Accessibility</span>
+        <h1 className="font-headline-lg text-headline-lg text-text-primary tracking-tight font-semibold flex items-center gap-2">
+          <Settings className="w-6 h-6 text-brand" />
+          <span>Make ClearStep yours</span>
+          <span className="sr-only">Preferences & Accessibility</span>
         </h1>
-        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-          Tune ClearStep to match your sensory and focus rhythm. All settings persist locally.
+        <p className="font-body-md text-body-md text-text-secondary mt-1">
+          Personalize your focus sessions, accessibility, and data preferences.
         </p>
       </div>
 
@@ -83,8 +84,8 @@ export const SettingsView: React.FC = () => {
           role="status"
           className={`p-4 rounded-xl text-xs flex items-center justify-between gap-2 ${
             importStatus.success
-              ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-              : 'bg-red-50 dark:bg-red-950/70 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800'
+              ? 'bg-success-bg text-success border border-success/30'
+              : 'bg-danger-bg text-danger border border-danger/30'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -93,7 +94,7 @@ export const SettingsView: React.FC = () => {
           </div>
           <button
             onClick={() => setImportStatus(null)}
-            className="text-xs font-semibold underline"
+            className="text-xs font-semibold underline cursor-pointer"
           >
             Dismiss
           </button>
@@ -101,22 +102,23 @@ export const SettingsView: React.FC = () => {
       )}
 
       {/* Timer Durations Section */}
-      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
-        <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+      <section className="bg-bg-surface border border-border-subtle/40 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
+        <h2 className="font-headline-sm text-headline-sm font-semibold text-text-primary flex items-center gap-2">
+          <Clock className="w-4 h-4 text-brand" />
           <span>Focus & Break Intervals</span>
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label htmlFor="focus-dur" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label htmlFor="focus-dur" className="block font-label-md text-label-md font-semibold text-text-secondary mb-1.5">
               Focus Duration
             </label>
             <select
               id="focus-dur"
               value={preferences.focusDuration}
               onChange={(e) => updatePreferences({ focusDuration: Number(e.target.value) })}
-              className="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+              className="w-full font-body-md text-body-md px-3 py-2 rounded-xl border border-border-subtle/40 bg-white bg-bg-surface text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              style={{ backgroundColor: '#FFFFFF' }}
             >
               <option value={15}>15 minutes (Gentle)</option>
               <option value={20}>20 minutes</option>
@@ -127,14 +129,15 @@ export const SettingsView: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="short-break-dur" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label htmlFor="short-break-dur" className="block font-label-md text-label-md font-semibold text-text-secondary mb-1.5">
               Short Break
             </label>
             <select
               id="short-break-dur"
               value={preferences.shortBreakDuration}
               onChange={(e) => updatePreferences({ shortBreakDuration: Number(e.target.value) })}
-              className="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+              className="w-full font-body-md text-body-md px-3 py-2 rounded-xl border border-border-subtle/40 bg-white bg-bg-surface text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              style={{ backgroundColor: '#FFFFFF' }}
             >
               <option value={3}>3 minutes</option>
               <option value={5}>5 minutes (Standard)</option>
@@ -143,14 +146,15 @@ export const SettingsView: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="long-break-dur" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label htmlFor="long-break-dur" className="block font-label-md text-label-md font-semibold text-text-secondary mb-1.5">
               Long Break
             </label>
             <select
               id="long-break-dur"
               value={preferences.longBreakDuration}
               onChange={(e) => updatePreferences({ longBreakDuration: Number(e.target.value) })}
-              className="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+              className="w-full font-body-md text-body-md px-3 py-2 rounded-xl border border-border-subtle/40 bg-white bg-bg-surface text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              style={{ backgroundColor: '#FFFFFF' }}
             >
               <option value={10}>10 minutes</option>
               <option value={15}>15 minutes (Standard)</option>
@@ -162,18 +166,18 @@ export const SettingsView: React.FC = () => {
       </section>
 
       {/* Visual & Accessibility Options */}
-      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
-        <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <Eye className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+      <section className="bg-bg-surface border border-border-subtle/40 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
+        <h2 className="font-headline-sm text-headline-sm font-semibold text-text-primary flex items-center gap-2">
+          <Eye className="w-4 h-4 text-brand" />
           <span>Appearance & Accessibility</span>
         </h2>
 
         <div className="space-y-4">
           {/* Theme Mode */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-border-subtle/20">
             <div>
-              <p className="text-sm font-semibold text-slate-900 dark:text-white">Color Theme</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Choose your preferred visual contrast mode</p>
+              <p className="font-title-sm text-title-sm font-semibold text-text-primary">Color Theme</p>
+              <p className="font-body-sm text-body-sm text-text-secondary">Choose your preferred visual contrast mode</p>
             </div>
             <div className="flex items-center gap-2">
               {(['system', 'light', 'dark'] as const).map((t) => (
@@ -181,10 +185,10 @@ export const SettingsView: React.FC = () => {
                   key={t}
                   type="button"
                   onClick={() => setTheme(t)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
+                  className={`px-3 py-1.5 rounded-lg font-label-md text-label-md font-semibold capitalize transition-all cursor-pointer ${
                     preferences.theme === t
-                      ? 'bg-blue-600 text-white shadow-sm'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                      ? 'bg-brand text-brand-on shadow-sm'
+                      : 'bg-bg-sunken text-text-secondary hover:bg-border-subtle/40 hover:text-text-primary'
                   }`}
                 >
                   {t}
@@ -194,10 +198,10 @@ export const SettingsView: React.FC = () => {
           </div>
 
           {/* Reduced Motion Toggle */}
-          <div className="flex items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center justify-between gap-3 pb-4 border-b border-border-subtle/20">
             <div>
-              <p className="text-sm font-semibold text-slate-900 dark:text-white">Reduced Motion</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="font-title-sm text-title-sm font-semibold text-text-primary">Reduced Motion</p>
+              <p className="font-body-sm text-body-sm text-text-secondary">
                 Disables all non-essential animations and transitions to prevent vestibular strain
               </p>
             </div>
@@ -206,16 +210,16 @@ export const SettingsView: React.FC = () => {
               id="reduced-motion-toggle"
               checked={preferences.reducedMotion}
               onChange={(e) => updatePreferences({ reducedMotion: e.target.checked })}
-              className="w-5 h-5 rounded text-blue-600 focus:ring-blue-500 border-slate-300 dark:border-slate-700 cursor-pointer"
+              className="w-5 h-5 rounded accent-brand text-brand focus:ring-brand cursor-pointer"
             />
           </div>
 
           {/* High Contrast Focus Outlines */}
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold text-slate-900 dark:text-white">High-Contrast Focus Rings</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Enhances keyboard focus indicators with thick 3px blue borders and offsets
+              <p className="font-title-sm text-title-sm font-semibold text-text-primary">High-Contrast Focus Rings</p>
+              <p className="font-body-sm text-body-sm text-text-secondary">
+                Enhances keyboard focus indicators with thick 3px brand borders and offsets
               </p>
             </div>
             <input
@@ -223,25 +227,25 @@ export const SettingsView: React.FC = () => {
               id="high-contrast-toggle"
               checked={preferences.highContrastFocus}
               onChange={(e) => updatePreferences({ highContrastFocus: e.target.checked })}
-              className="w-5 h-5 rounded text-blue-600 focus:ring-blue-500 border-slate-300 dark:border-slate-700 cursor-pointer"
+              className="w-5 h-5 rounded accent-brand text-brand focus:ring-brand cursor-pointer"
             />
           </div>
         </div>
       </section>
 
       {/* Local-First Data Sovereignty & Backup */}
-      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
+      <section className="bg-bg-surface border border-border-subtle/40 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          <h2 className="font-headline-sm text-headline-sm font-semibold text-text-primary flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-brand" />
             <span>Data Ownership & Backups</span>
           </h2>
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/70 px-2 py-0.5 rounded">
+          <span className="font-label-sm text-label-sm font-semibold uppercase tracking-wider text-success bg-success-bg px-2 py-0.5 rounded">
             100% Offline
           </span>
         </div>
 
-        <p className="text-xs text-slate-600 dark:text-slate-400">
+        <p className="font-body-sm text-body-sm text-text-secondary leading-relaxed">
           Your tasks and focus records are stored strictly on your computer. You can export a full JSON backup to move between browsers or restore past work.
         </p>
 
@@ -257,7 +261,7 @@ export const SettingsView: React.FC = () => {
           </Button>
 
           {/* Import Button */}
-          <label className="inline-flex items-center justify-center font-medium rounded-lg transition-colors focus-within:ring-2 focus-within:ring-blue-600 text-xs px-3 py-1.5 gap-1.5 border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 shadow-sm cursor-pointer min-h-[36px]">
+          <label className="inline-flex items-center justify-center font-label-md text-label-md font-medium rounded-xl transition-colors focus-within:ring-2 focus-within:ring-brand px-3 py-1.5 gap-1.5 border border-border-subtle/40 bg-bg-surface text-text-primary hover:bg-bg-sunken shadow-sm cursor-pointer min-h-[36px]">
             <Upload className="w-3.5 h-3.5" />
             <span>Import Backup</span>
             <input
@@ -289,7 +293,7 @@ export const SettingsView: React.FC = () => {
               resetPreferences();
             }
           }}
-          className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+          className="font-body-sm text-body-sm text-text-tertiary hover:text-text-primary transition-colors cursor-pointer"
         >
           Restore default preferences
         </button>

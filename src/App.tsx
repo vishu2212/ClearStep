@@ -14,7 +14,7 @@ import { SettingsView } from './components/settings/SettingsView';
 import { useTasks } from './context/TaskContext';
 import { useTimer } from './context/TimerContext';
 import { getLocalDateString } from './domain/recommendationEngine';
-import { Plus, PlusCircle, Timer, CheckCircle2, Clock } from 'lucide-react';
+import { Plus, PlusCircle, Timer, CheckCircle2, Clock, Calendar } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<NavTab>(() => {
@@ -114,9 +114,6 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-bg-page font-body-md text-text-primary antialiased selection:bg-brand-tint selection:text-brand-strong flex flex-col">
-      {/* Safe Storage Recovery Banner */}
-      <CorruptionAlert />
-
       {/* Stitch Approved Fixed Left Sidebar (248px) */}
       <Sidebar
         activeTab={activeTab}
@@ -126,7 +123,7 @@ export const App: React.FC = () => {
       />
 
       {/* Workspace Wrapper (offset by left sidebar 248px on desktop) */}
-      <div className="pl-0 lg:pl-[248px] flex flex-col flex-1">
+      <div className="pl-0 lg:pl-[248px] flex flex-col flex-1 min-w-0">
         {/* Stitch Approved Fixed Top Header (56px) */}
         <Header
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
@@ -135,29 +132,37 @@ export const App: React.FC = () => {
         />
 
         {/* Main Content Area (offset by top header 56px) */}
-        <main className="relative pt-14 min-h-screen bg-bg-page w-full px-space-md sm:px-space-lg">
+        <main className="relative pt-14 min-h-screen bg-bg-page w-full px-space-md sm:px-space-lg min-w-0">
+          {/* Safe Storage Recovery Banner placed within flow under fixed header */}
+          <CorruptionAlert />
+
           {/* TAB 1: TODAY (APPROVED STITCH 2-COLUMN DASHBOARD) */}
           {activeTab === 'today' && (
-            <div className="flex flex-col w-full animate-fade-in pt-space-xs">
+            <div className="flex flex-col w-full animate-fade-in pt-space-xs min-w-0">
               {/* Main Grid: Primary Focus Area + Right 320px Contextual Panel */}
-              <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-space-xl items-start pb-space-2xl max-w-[1240px]">
+              <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-space-xl items-start pb-space-2xl max-w-[1240px] w-full min-w-0">
                 {/* LEFT / MAIN WORKSPACE COLUMN (~880px max feel) */}
-                <div className="flex flex-col gap-space-lg min-w-0">
+                <div className="flex flex-col gap-space-lg min-w-0 w-full">
                   {/* Screen Heading & Page Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-space-md pt-space-xs">
-                    <div className="flex flex-col">
+                  <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 pt-space-xs">
+                    <div className="flex flex-col min-w-0">
                       <h1 className="font-headline-lg text-headline-lg text-text-primary tracking-tight font-semibold">
-                        Today
+                        Your day, made manageable
                       </h1>
-                      <p className="font-body-md text-body-md text-text-secondary mt-1 flex items-center gap-2">
-                        <span>Good morning. Let's make today manageable.</span>
-                        <span className="sr-only">One clear next step for today.</span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-border-strong inline-block"></span>
-                        <span className="text-text-tertiary">{formattedDate}</span>
-                      </p>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-1">
+                        <p className="font-body-md text-body-md text-text-secondary">
+                          <span>One clear next step. Make progress without the overwhelm.</span>
+                          <span className="sr-only">One clear next step for today.</span>
+                        </p>
+                        {/* Separate aligned date element that wraps below caption on narrow screens */}
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-bg-sunken border border-border-subtle/40 text-text-tertiary font-label-sm text-xs font-medium shrink-0">
+                          <Calendar className="w-3.5 h-3.5 text-brand shrink-0" />
+                          <span>{formattedDate}</span>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-space-sm self-start sm:self-auto">
+                    <div className="flex items-center gap-space-sm self-start sm:self-auto shrink-0">
                       <button
                         onClick={handleOpenNewTask}
                         aria-label="Create new task"
@@ -182,10 +187,10 @@ export const App: React.FC = () => {
                     <label className="sr-only" htmlFor="quick-add-task-input">
                       Quick add a task for today
                     </label>
-                    <div className="relative flex items-center rounded-xl bg-bg-surface shadow-sm transition-all focus-within:ring-2 focus-within:ring-brand border border-border-subtle/30">
-                      <PlusCircle className="w-5 h-5 text-text-tertiary ml-space-md shrink-0" />
+                    <div className="relative flex items-center rounded-xl bg-bg-surface shadow-xs transition-all focus-within:ring-2 focus-within:ring-brand border border-border-subtle/40">
+                      <PlusCircle className="w-5 h-5 text-text-tertiary ml-4 shrink-0" />
                       <input
-                        className="w-full h-[48px] bg-transparent pl-space-sm pr-16 font-body-md text-body-md text-text-primary placeholder:text-text-tertiary focus:outline-none"
+                        className="w-full h-[52px] bg-transparent pl-3 pr-28 font-body-md text-body-md text-text-primary placeholder:text-text-tertiary focus:outline-none"
                         id="quick-add-task-input"
                         value={quickAddTitle}
                         onChange={(e) => setQuickAddTitle(e.target.value)}
@@ -193,8 +198,8 @@ export const App: React.FC = () => {
                         placeholder="Add a task for today... (Press Enter to save)"
                         type="text"
                       />
-                      <div className="absolute right-space-md flex items-center gap-1 pointer-events-none">
-                        <span className="font-mono text-xs text-text-tertiary bg-bg-sunken px-1.5 py-0.5 rounded">
+                      <div className="absolute right-4 flex items-center gap-1 pointer-events-none select-none">
+                        <span className="font-mono font-label-sm text-xs text-text-tertiary bg-bg-sunken px-2 py-0.5 rounded border border-border-subtle/30 shadow-2xs">
                           ↵ Enter
                         </span>
                       </div>
@@ -222,15 +227,15 @@ export const App: React.FC = () => {
 
                     {/* Task Rows Container */}
                     <div
-                      className="flex flex-col rounded-xl bg-bg-surface shadow-sm overflow-hidden border border-border-subtle/30 divide-y divide-bg-sunken"
+                      className="flex flex-col rounded-xl bg-bg-surface shadow-sm overflow-hidden border border-border-subtle/40 divide-y divide-border-subtle/20"
                       id="task-rows-container"
                     >
                       {todayTasks.length === 0 ? (
                         <div className="p-8 text-center text-text-secondary">
-                          <p className="font-semibold text-text-primary mb-1">
+                          <p className="font-title-sm text-title-sm font-semibold text-text-primary mb-1">
                             No active tasks scheduled for today.
                           </p>
-                          <p className="text-xs text-text-tertiary">
+                          <p className="font-body-sm text-body-sm text-text-tertiary">
                             Use the quick-add input above or add a task to plan ahead.
                           </p>
                         </div>
@@ -251,7 +256,7 @@ export const App: React.FC = () => {
                   {/* 8A: DAILY OVERVIEW STRIP (Quiet, honest 3-item row) */}
                   <footer
                     aria-label="Daily honest metrics"
-                    className="flex flex-wrap items-center justify-between gap-space-md px-space-md py-space-sm rounded-xl bg-bg-surface/80 text-text-secondary font-body-sm text-body-sm shadow-sm mt-space-xs border border-border-subtle/30"
+                    className="flex flex-wrap items-center justify-between gap-4 px-space-lg py-3 rounded-xl bg-bg-surface text-text-secondary font-body-sm shadow-sm mt-space-sm border border-border-subtle/40"
                   >
                     <div className="flex items-center gap-2">
                       <Timer className="w-4 h-4 text-brand shrink-0" />
@@ -287,10 +292,11 @@ export const App: React.FC = () => {
             <div className="space-y-6 animate-fade-in py-space-lg max-w-5xl">
               <div>
                 <h1 className="font-headline-lg text-headline-lg text-text-primary tracking-tight font-semibold">
-                  All Tasks & Backlog
+                  <span>All tasks & backlog</span>
+                  <span className="sr-only">All Tasks & Backlog</span>
                 </h1>
                 <p className="font-body-md text-body-md text-text-secondary mt-1">
-                  Filter, search, organize, and deconstruct your assignments into discrete steps.
+                  Capture, organize, and break assignments into achievable steps.
                 </p>
               </div>
 
@@ -300,16 +306,16 @@ export const App: React.FC = () => {
               {/* Tasks List */}
               {filteredTasks.length === 0 ? (
                 <div className="bg-bg-surface border border-border-subtle/40 rounded-2xl p-10 text-center">
-                  <p className="text-sm font-semibold text-text-primary mb-1">
+                  <p className="font-title-sm text-title-sm font-semibold text-text-primary mb-1">
                     No matching tasks found.
                   </p>
-                  <p className="text-xs text-text-tertiary mb-4">
+                  <p className="font-body-sm text-body-sm text-text-tertiary mb-4">
                     Try adjusting your search query, clearing filters, or create a new task.
                   </p>
                   <button
                     type="button"
                     onClick={handleOpenNewTask}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-brand text-brand-on shadow-sm hover:bg-brand-strong cursor-pointer"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl font-label-md text-label-md font-semibold bg-brand text-brand-on shadow-sm hover:bg-brand-strong cursor-pointer"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Create Task (n)</span>

@@ -270,72 +270,84 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
   const elapsedSeconds = Math.max(0, targetSeconds - remainingSeconds);
 
   return (
-    <div className="relative min-h-screen bg-surface px-space-md sm:px-space-xl py-space-md text-on-surface flex flex-col font-body-md selection:bg-brand-tint selection:text-brand-strong animate-fade-in">
+    <div className="relative min-h-screen bg-bg-page px-space-md sm:px-space-xl py-space-md text-text-primary flex flex-col font-body-md selection:bg-brand-tint selection:text-brand-strong animate-fade-in">
+      {/* Page Heading & Caption */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-space-md mb-space-md">
+        <div>
+          <h1 className="font-headline-lg text-headline-lg text-text-primary tracking-tight font-semibold">
+            Protect your focus
+          </h1>
+          <p className="font-body-md text-body-md text-text-secondary mt-1">
+            Work on one task at a time, with fewer distractions.
+          </p>
+        </div>
+      </div>
+
       {/* 1. MINIMALIST FOCUS HEADER */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-space-md mb-space-lg border-b border-surface-container gap-space-sm">
-        {/* Left: Exit button & Task breadcrumbs */}
-        <div className="flex flex-wrap items-center gap-space-sm sm:gap-space-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-space-md mb-space-lg border-b border-border-subtle/30 gap-space-sm">
+        {/* Left: Exit button & Task breadcrumbs cleanly grouped */}
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <button
             onClick={handleExitClick}
             id="exit-btn"
-            className="flex items-center gap-space-xs px-space-md py-space-xs rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors font-title-sm text-title-sm cursor-pointer select-none"
+            className="h-[40px] px-3.5 py-1.5 rounded-lg bg-bg-surface hover:bg-bg-sunken text-text-secondary hover:text-text-primary border border-border-subtle/40 transition-colors font-title-sm text-title-sm cursor-pointer select-none shadow-xs inline-flex items-center gap-2"
             aria-label="Exit Focus Mode (Esc)"
             type="button"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Exit Focus Mode</span>
-            <span className="ml-space-xs px-1.5 py-0.5 rounded bg-surface-container-lowest text-outline font-label-sm text-label-sm uppercase font-mono">
+            <span className="ml-1 px-1.5 py-0.5 rounded bg-bg-sunken text-text-tertiary font-label-sm text-xs uppercase font-mono">
               Esc
             </span>
           </button>
 
-          <div className="hidden sm:block h-4 w-px bg-surface-container-highest"></div>
+          <div className="hidden sm:block h-4 w-px bg-border-subtle/60"></div>
 
-          <div className="flex flex-wrap items-center gap-space-xs font-label-md text-label-md text-on-surface-variant">
-            <span className="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-semibold">
+          <div className="flex flex-wrap items-center gap-2 font-label-md text-label-md text-text-secondary">
+            <span className="px-2.5 py-0.5 rounded-full bg-brand-tint text-brand-strong font-semibold text-xs">
               {courseTag}
             </span>
-            <span>Senior Thesis</span>
-            <span className="text-outline">/</span>
-            <span className="text-on-surface font-title-sm text-title-sm font-semibold truncate max-w-[260px]">
+            <span className="text-text-tertiary">Senior Thesis</span>
+            <span className="text-border-strong select-none">/</span>
+            <span className="text-text-primary font-title-sm text-title-sm font-semibold truncate max-w-[260px]">
               {taskTitle}
             </span>
-            <span className="text-outline">•</span>
-            <span className="text-secondary font-semibold">Deep Block 1 of 3</span>
+            <span className="text-border-strong select-none">•</span>
+            <span className="text-text-tertiary font-medium text-xs">Deep Block 1 of 3</span>
           </div>
         </div>
 
-        {/* Right: Flow Guard Active indicator & Fullscreen button */}
-        <div className="flex items-center gap-space-sm self-end sm:self-auto">
-          {/* Mode Selector Pill (Ensures compatibility with existing integration tests) */}
-          <div className="hidden md:inline-flex items-center p-0.5 bg-surface-container rounded-lg mr-2" role="tablist">
+        {/* Right: Mode pills, Flow Guard Active, and Fullscreen button separated */}
+        <div className="flex items-center gap-3 self-end sm:self-auto">
+          {/* Mode Selector Pill */}
+          <div className="hidden md:inline-flex items-center p-0.5 bg-bg-sunken border border-border-subtle/40 rounded-lg" role="tablist">
             <button
               onClick={() => switchMode('focus')}
-              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
-                mode === 'focus' ? 'bg-surface-container-lowest text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
+              className={`px-3 py-1 rounded-md font-label-md text-xs sm:text-sm font-semibold transition-all ${
+                mode === 'focus' ? 'bg-bg-surface text-brand shadow-xs' : 'text-text-secondary hover:text-text-primary'
               }`}
             >
               Deep Focus
             </button>
             <button
               onClick={() => switchMode('shortBreak')}
-              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
-                mode === 'shortBreak' ? 'bg-surface-container-lowest text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
+              className={`px-3 py-1 rounded-md font-label-md text-xs sm:text-sm font-semibold transition-all ${
+                mode === 'shortBreak' ? 'bg-bg-surface text-brand shadow-xs' : 'text-text-secondary hover:text-text-primary'
               }`}
             >
               Short Break
             </button>
           </div>
 
-          <div className="flex items-center gap-space-xs px-space-sm py-1 rounded-full bg-surface-container-lowest shadow-sm text-secondary font-label-md text-label-md">
-            <span className="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-bg-surface border border-border-subtle/30 shadow-xs text-brand font-label-md text-xs sm:text-sm">
+            <span className="w-2 h-2 rounded-full bg-brand animate-pulse"></span>
             <span className="font-medium">Flow Guard Active</span>
           </div>
 
           <button
             onClick={toggleFullscreen}
             id="fullscreen-btn"
-            className="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface-variant hover:text-on-surface shadow-sm transition-colors font-label-md text-label-md cursor-pointer select-none"
+            className="h-[36px] flex items-center gap-1.5 px-3 rounded-lg bg-bg-surface hover:bg-bg-sunken text-text-secondary hover:text-text-primary border border-border-subtle/40 shadow-xs transition-colors font-label-md text-xs sm:text-sm cursor-pointer select-none"
             aria-label="Toggle Fullscreen (F)"
             type="button"
           >
@@ -345,18 +357,18 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
         </div>
       </div>
 
-      {/* 2. MAIN FOCUS ARENA: 12-COLUMN ASYMMETRIC GRID SPLIT */}
-      <div className="grid grid-cols-12 gap-gutter-desktop items-start max-w-[1400px] w-full mx-auto">
-        {/* LEFT COLUMN: TIMER & IMMERSION CORE (7 COLUMNS) */}
-        <div className="col-span-12 lg:col-span-7 flex flex-col gap-space-xl">
+      {/* 2. MAIN FOCUS ARENA: ASYMMETRIC GRID SPLIT */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-gutter-desktop items-start max-w-[1240px] w-full mx-auto min-w-0">
+        {/* LEFT COLUMN: TIMER & IMMERSION CORE (7 COLUMNS ON XL) */}
+        <div className="col-span-1 xl:col-span-7 flex flex-col gap-space-xl min-w-0 w-full">
           {/* MONUMENTAL TIMER CARD */}
-          <div className="relative overflow-hidden rounded-xl bg-surface-container-lowest p-space-xl sm:p-space-2xl shadow-[0_4px_24px_rgba(25,25,27,0.04)] flex flex-col items-center justify-center text-center border border-border-subtle/30">
+          <div className="relative overflow-hidden rounded-xl bg-bg-surface p-space-xl sm:p-space-2xl shadow-sm flex flex-col items-center justify-center text-center border border-border-subtle/40">
             {/* Subtle Top Context Label */}
             <div className="flex items-center gap-space-xs mb-space-md">
-              <span className="px-space-sm py-space-xxs rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm uppercase tracking-wider font-semibold">
+              <span className="px-space-sm py-space-xxs rounded-full bg-brand-tint text-brand-strong font-label-sm text-label-sm uppercase tracking-wider font-semibold">
                 {mode === 'focus' ? 'Deep Cognitive Block' : 'Restorative Break'}
               </span>
-              <span className="font-label-sm text-label-sm text-on-surface-variant">
+              <span className="font-label-sm text-label-sm text-text-secondary">
                 Target: {Math.floor(targetSeconds / 60)}m 00s
               </span>
             </div>
@@ -366,7 +378,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 320 320">
                 {/* Background Track Circle */}
                 <circle
-                  className="text-surface-container"
+                  className="text-bg-sunken"
                   cx="160"
                   cy="160"
                   fill="transparent"
@@ -376,7 +388,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                 />
                 {/* Active Progress Circle */}
                 <circle
-                  className="text-primary-container transition-all duration-300 ease-out"
+                  className="text-brand transition-all duration-300 ease-out"
                   cx="160"
                   cy="160"
                   fill="transparent"
@@ -392,30 +404,30 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
 
               {/* Core Numeric Center Display */}
               <div className="absolute inset-0 flex flex-col items-center justify-center select-none pointer-events-none">
-                <span className="font-label-sm text-label-sm uppercase tracking-widest text-outline mb-1">
+                <span className="font-label-sm text-label-sm uppercase tracking-widest text-text-tertiary mb-1">
                   Time Remaining
                 </span>
                 <div
                   id="timer-display"
-                  className="font-numeric-timer text-[56px] sm:text-[64px] leading-none text-on-surface tracking-tight font-bold"
+                  className="font-numeric-timer text-[56px] sm:text-[64px] leading-none text-text-primary tracking-tight font-bold"
                   aria-live="polite"
                   aria-atomic="true"
                 >
                   {formatTimerDisplay(remainingSeconds)}
                 </div>
-                <div className="flex items-center gap-space-xs mt-space-sm font-label-md text-label-md text-on-surface-variant">
-                  <Clock className="w-4 h-4 text-secondary" />
+                <div className="flex items-center gap-space-xs mt-space-sm font-label-md text-label-md text-text-secondary">
+                  <Clock className="w-4 h-4 text-brand" />
                   <span>{formatTimerDisplay(elapsedSeconds)} elapsed</span>
                 </div>
               </div>
             </div>
 
-            {/* Control Deck: +5 Min, Play/Pause [Space], Reset, Complete */}
-            <div className="flex items-center gap-space-sm sm:gap-space-md mt-space-md">
+            {/* Control Deck: +5 Min, Reset, Play/Pause [Space], Complete (Unified 48px height) */}
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-space-md">
               <button
                 onClick={() => addSeconds(300)}
                 id="add-time-btn"
-                className="flex items-center gap-space-xs px-space-md py-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-title-sm text-title-sm transition-colors cursor-pointer select-none"
+                className="h-[48px] px-4 rounded-xl bg-bg-sunken hover:bg-border-subtle/40 text-text-primary border border-border-subtle/40 font-label-md text-label-md font-semibold inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer select-none"
                 type="button"
                 aria-label="Add 5 minutes to timer"
               >
@@ -429,7 +441,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                   resetTimer();
                 }}
                 id="reset-timer-btn"
-                className="p-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer select-none"
+                className="h-[48px] w-[48px] rounded-xl bg-bg-sunken hover:bg-border-subtle/40 text-text-secondary hover:text-text-primary border border-border-subtle/40 transition-colors inline-flex items-center justify-center cursor-pointer select-none"
                 type="button"
                 aria-label="Reset timer"
                 title="Reset timer"
@@ -442,13 +454,13 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                 <button
                   onClick={pauseTimer}
                   id="play-pause-btn"
-                  className="flex items-center justify-center gap-space-sm px-space-xl py-space-md rounded-xl bg-primary-container hover:bg-brand text-on-primary font-title-md text-title-md shadow-[0_4px_16px_rgba(59,73,223,0.25)] transition-all transform active:scale-95 cursor-pointer select-none"
+                  className="h-[48px] px-6 sm:px-7 rounded-xl bg-brand hover:bg-brand-strong text-brand-on font-title-sm text-title-sm sm:font-title-md sm:text-title-md font-semibold shadow-sm transition-all transform active:scale-95 inline-flex items-center justify-center gap-2 cursor-pointer select-none"
                   type="button"
                   aria-label="Pause timer"
                 >
                   <Pause className="w-5 h-5 fill-current" />
                   <span id="play-pause-label">Pause</span>
-                  <span className="ml-space-xs px-1.5 py-0.5 rounded bg-primary text-on-primary-container font-label-sm text-label-sm font-mono">
+                  <span className="ml-1 px-1.5 py-0.5 rounded bg-brand-strong/40 text-brand-tint font-label-sm text-xs font-mono">
                     Space
                   </span>
                 </button>
@@ -456,13 +468,13 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                 <button
                   onClick={resumeTimer}
                   id="play-pause-btn"
-                  className="flex items-center justify-center gap-space-sm px-space-xl py-space-md rounded-xl bg-primary-container hover:bg-brand text-on-primary font-title-md text-title-md shadow-[0_4px_16px_rgba(59,73,223,0.25)] transition-all transform active:scale-95 cursor-pointer select-none"
+                  className="h-[48px] px-6 sm:px-7 rounded-xl bg-brand hover:bg-brand-strong text-brand-on font-title-sm text-title-sm sm:font-title-md sm:text-title-md font-semibold shadow-sm transition-all transform active:scale-95 inline-flex items-center justify-center gap-2 cursor-pointer select-none"
                   type="button"
                   aria-label="Resume timer"
                 >
                   <Play className="w-5 h-5 fill-current" />
                   <span id="play-pause-label">Resume</span>
-                  <span className="ml-space-xs px-1.5 py-0.5 rounded bg-primary text-on-primary-container font-label-sm text-label-sm font-mono">
+                  <span className="ml-1 px-1.5 py-0.5 rounded bg-brand-strong/40 text-brand-tint font-label-sm text-xs font-mono">
                     Space
                   </span>
                 </button>
@@ -473,13 +485,13 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                     startTimer(activeTaskId, activeTaskTitle);
                   }}
                   id="play-pause-btn"
-                  className="flex items-center justify-center gap-space-sm px-space-xl py-space-md rounded-xl bg-primary-container hover:bg-brand text-on-primary font-title-md text-title-md shadow-[0_4px_16px_rgba(59,73,223,0.25)] transition-all transform active:scale-95 cursor-pointer select-none"
+                  className="h-[48px] px-6 sm:px-7 rounded-xl bg-brand hover:bg-brand-strong text-brand-on font-title-sm text-title-sm sm:font-title-md sm:text-title-md font-semibold shadow-sm transition-all transform active:scale-95 inline-flex items-center justify-center gap-2 cursor-pointer select-none"
                   type="button"
                   aria-label="Start timer"
                 >
                   <Play className="w-5 h-5 fill-current" />
                   <span id="play-pause-label">Start</span>
-                  <span className="ml-space-xs px-1.5 py-0.5 rounded bg-primary text-on-primary-container font-label-sm text-label-sm font-mono">
+                  <span className="ml-1 px-1.5 py-0.5 rounded bg-brand-strong/40 text-brand-tint font-label-sm text-xs font-mono">
                     Space
                   </span>
                 </button>
@@ -489,36 +501,40 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
               <button
                 onClick={completeSessionNow}
                 id="finish-early-btn"
-                className="flex items-center gap-space-xs px-space-md py-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-title-sm text-title-sm transition-colors cursor-pointer select-none"
+                className="h-[48px] px-4 rounded-xl bg-bg-sunken hover:bg-success-bg text-text-primary hover:text-success border border-border-subtle/40 font-label-md text-label-md font-semibold transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer select-none"
                 type="button"
                 aria-label="Complete session early"
               >
-                <CheckCircle2 className="w-4 h-4 text-secondary" />
+                <CheckCircle2 className="w-4 h-4 text-success" />
                 <span>Complete</span>
               </button>
             </div>
 
-            {/* Session Pacing Baseline */}
-            <p className="font-body-sm text-body-sm text-on-surface-variant mt-space-lg max-w-lg">
-              No external notifications permitted. You are in your uninterrupted 90-minute morning apex window.
-            </p>
+            {/* Session Pacing Baseline (Moved below in its own quiet row) */}
+            <div className="mt-8 pt-4 border-t border-border-subtle/20 w-full text-center">
+              <p className="font-body-sm text-body-sm text-text-tertiary max-w-lg mx-auto leading-relaxed">
+                No external notifications permitted. You are in your uninterrupted 90-minute morning apex window.
+              </p>
+            </div>
           </div>
 
           {/* AMBIENT AUDIO DECK & ENVIRONMENT (100% Offline Web Audio API) */}
-          <div className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm border border-border-subtle/30 flex flex-col gap-space-md">
+          <div className="rounded-xl bg-bg-surface p-space-lg shadow-sm border border-border-subtle/40 flex flex-col gap-space-md">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-space-sm">
-                <div className="w-9 h-9 rounded-lg bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed">
-                  <Volume2 className="w-5 h-5" />
+                <div className="w-10 h-10 rounded-lg bg-brand-tint flex items-center justify-center text-brand-strong shrink-0">
+                  <Volume2 className="w-5 h-5 text-brand" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-title-sm text-title-sm text-on-surface font-semibold">
+                  {/* Line 1: Title */}
+                  <span className="font-title-sm text-title-sm text-text-primary font-semibold">
                     {ambientSound === 'brown' && 'Binaural Brown Noise (40Hz Deep Focus)'}
                     {ambientSound === 'rain' && 'Rain on Library Soundscape'}
                     {ambientSound === 'lofi' && 'Warm Lo-Fi Ambient Tone'}
                     {ambientSound === 'mute' && 'Ambient Sound Muted'}
                   </span>
-                  <span className="font-label-sm text-label-sm text-on-surface-variant">
+                  {/* Line 2: Subtitle */}
+                  <span className="font-label-sm text-label-sm text-text-secondary mt-0.5">
                     Synthetic brainwave entrainment • Calibrated for neuro-divergent flow
                   </span>
                 </div>
@@ -527,24 +543,24 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
               {/* Animated Mini Audio Equalizer Visualizer */}
               <div className="flex items-end gap-1 h-5 px-space-sm" aria-label="Audio visualizer">
                 <span
-                  className={`w-1 bg-secondary rounded-full transition-all ${
+                  className={`w-1 bg-brand rounded-full transition-all ${
                     ambientSound !== 'mute' ? 'h-3 animate-pulse' : 'h-1 opacity-40'
                   }`}
                 ></span>
                 <span
-                  className={`w-1 bg-secondary rounded-full transition-all ${
+                  className={`w-1 bg-brand rounded-full transition-all ${
                     ambientSound !== 'mute' ? 'h-5 animate-bounce' : 'h-1 opacity-40'
                   }`}
                   style={{ animationDelay: '0.15s' }}
                 ></span>
                 <span
-                  className={`w-1 bg-secondary rounded-full transition-all ${
+                  className={`w-1 bg-brand rounded-full transition-all ${
                     ambientSound !== 'mute' ? 'h-4 animate-pulse' : 'h-1 opacity-40'
                   }`}
                   style={{ animationDelay: '0.3s' }}
                 ></span>
                 <span
-                  className={`w-1 bg-secondary rounded-full transition-all ${
+                  className={`w-1 bg-brand rounded-full transition-all ${
                     ambientSound !== 'mute' ? 'h-2 animate-bounce' : 'h-1 opacity-40'
                   }`}
                   style={{ animationDelay: '0.2s' }}
@@ -553,16 +569,16 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
             </div>
 
             {/* Audio Presets & Volume Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-space-md pt-space-xs border-t border-surface-container">
-              {/* Preset Chips */}
-              <div className="flex flex-wrap items-center gap-space-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pt-2.5 border-t border-border-subtle/20">
+              {/* Distinct Presets Group (Allows wrapping with uniform gap) */}
+              <div className="flex flex-wrap items-center gap-2 min-w-0">
                 <button
                   type="button"
                   onClick={() => setAmbientSound('brown')}
-                  className={`px-space-sm py-1 rounded-full font-label-md text-label-md transition-colors cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-full font-label-md text-xs sm:text-sm font-medium transition-colors cursor-pointer select-none ${
                     ambientSound === 'brown'
-                      ? 'bg-secondary text-on-secondary font-semibold'
-                      : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant'
+                      ? 'bg-brand text-brand-on font-semibold shadow-xs'
+                      : 'bg-bg-sunken hover:bg-border-subtle/40 text-text-secondary'
                   }`}
                 >
                   Brown Noise
@@ -570,10 +586,10 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                 <button
                   type="button"
                   onClick={() => setAmbientSound('rain')}
-                  className={`px-space-sm py-1 rounded-full font-label-md text-label-md transition-colors cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-full font-label-md text-xs sm:text-sm font-medium transition-colors cursor-pointer select-none ${
                     ambientSound === 'rain'
-                      ? 'bg-secondary text-on-secondary font-semibold'
-                      : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant'
+                      ? 'bg-brand text-brand-on font-semibold shadow-xs'
+                      : 'bg-bg-sunken hover:bg-border-subtle/40 text-text-secondary'
                   }`}
                 >
                   Rain on Library
@@ -581,10 +597,10 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                 <button
                   type="button"
                   onClick={() => setAmbientSound('lofi')}
-                  className={`px-space-sm py-1 rounded-full font-label-md text-label-md transition-colors cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-full font-label-md text-xs sm:text-sm font-medium transition-colors cursor-pointer select-none ${
                     ambientSound === 'lofi'
-                      ? 'bg-secondary text-on-secondary font-semibold'
-                      : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant'
+                      ? 'bg-brand text-brand-on font-semibold shadow-xs'
+                      : 'bg-bg-sunken hover:bg-border-subtle/40 text-text-secondary'
                   }`}
                 >
                   Warm Lo-Fi
@@ -592,19 +608,23 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                 <button
                   type="button"
                   onClick={() => setAmbientSound('mute')}
-                  className={`px-space-sm py-1 rounded-full font-label-md text-label-md transition-colors cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-full font-label-md text-xs sm:text-sm font-medium transition-colors cursor-pointer select-none ${
                     ambientSound === 'mute'
-                      ? 'bg-surface-container-highest text-on-surface font-semibold'
-                      : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant'
+                      ? 'bg-text-primary text-brand-on font-semibold shadow-xs'
+                      : 'bg-bg-sunken hover:bg-border-subtle/40 text-text-secondary'
                   }`}
                 >
                   Mute Sound
                 </button>
               </div>
 
-              {/* Volume Slider */}
-              <div className="flex items-center gap-space-xs text-on-surface-variant min-w-[140px]">
-                {ambientSound !== 'mute' ? <Volume2 className="w-4 h-4 text-secondary" /> : <VolumeX className="w-4 h-4 text-outline" />}
+              {/* Distinct Aligned Volume Group (Stacks below on narrow screens) */}
+              <div className="flex items-center gap-2.5 text-text-secondary self-start sm:self-center shrink-0 min-w-[160px] sm:justify-end">
+                {ambientSound !== 'mute' ? (
+                  <Volume2 className="w-4 h-4 text-brand shrink-0" />
+                ) : (
+                  <VolumeX className="w-4 h-4 text-text-tertiary shrink-0" />
+                )}
                 <input
                   type="range"
                   min="0"
@@ -612,10 +632,10 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                   step="0.05"
                   value={ambientVolume}
                   onChange={(e) => setAmbientVolume(parseFloat(e.target.value))}
-                  className="w-24 h-1.5 bg-surface-container-highest rounded-lg appearance-none cursor-pointer accent-secondary"
+                  className="w-24 sm:w-28 h-1.5 bg-bg-sunken rounded-lg appearance-none cursor-pointer accent-brand"
                   aria-label="Ambient audio volume"
                 />
-                <span className="font-label-sm text-label-sm font-mono w-9 text-right">
+                <span className="font-label-sm text-label-sm font-mono w-9 text-right text-text-secondary select-none">
                   {Math.round(ambientVolume * 100)}%
                 </span>
               </div>
@@ -623,51 +643,55 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
           </div>
 
           {/* QUICK SESSION WRAP TEASER / MILESTONE FORECAST */}
-          <div className="rounded-xl bg-surface-container-low p-space-md flex items-center justify-between border border-border-subtle/20">
-            <div className="flex items-center gap-space-sm">
-              <div className="w-9 h-9 rounded-lg bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed shrink-0">
-                <Sparkles className="w-5 h-5 text-secondary" />
+          <div className="rounded-xl bg-bg-surface p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-border-subtle/40 shadow-xs min-w-0">
+            {/* Flexible, min-width-zero content region */}
+            <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+              <div className="w-9 h-9 rounded-lg bg-brand-tint flex items-center justify-center text-brand-strong shrink-0 mt-0.5 sm:mt-0">
+                <Sparkles className="w-5 h-5 text-brand" />
               </div>
-              <div className="flex flex-col">
-                <span className="font-title-sm text-title-sm text-on-surface font-semibold">
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="font-title-sm text-title-sm text-text-primary font-semibold">
                   When timer concludes
                 </span>
-                <span className="font-body-sm text-body-sm text-on-surface-variant">
+                <p className="font-body-sm text-body-sm text-text-secondary mt-0.5 leading-relaxed break-words">
                   ClearStep automatically records +{Math.max(1, Math.round(targetSeconds / 60))} focus minutes and unlocks your 10-minute restorative walk break.
-                </span>
+                </p>
               </div>
             </div>
-            <button
-              onClick={completeSessionNow}
-              id="preview-log-btn"
-              className="px-space-sm py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container-highest text-on-surface font-label-md text-label-md shadow-sm transition-colors shrink-0 cursor-pointer"
-              type="button"
-            >
-              View Log Target
-            </button>
+            {/* Separate action region with appropriate gap; stacks below at narrow widths */}
+            <div className="flex items-center sm:self-center self-start shrink-0">
+              <button
+                onClick={completeSessionNow}
+                id="preview-log-btn"
+                className="h-[38px] px-4 rounded-lg bg-bg-sunken hover:bg-border-subtle/40 text-text-primary border border-border-subtle/40 font-label-md text-label-md shadow-xs transition-colors cursor-pointer select-none shrink-0"
+                type="button"
+              >
+                View Log Target
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* RIGHT COLUMN: MICRO-STEPS MATRIX & FRICTIONLESS SCRATCHPAD (5 COLUMNS) */}
-        <div className="col-span-12 lg:col-span-5 flex flex-col gap-space-xl">
+        {/* RIGHT COLUMN: MICRO-STEPS MATRIX & FRICTIONLESS SCRATCHPAD (5 COLUMNS ON XL) */}
+        <div className="col-span-1 xl:col-span-5 flex flex-col gap-space-xl min-w-0 w-full">
           {/* ACTIVE MICRO-STEP PROGRESS CARD */}
-          <div className="rounded-xl bg-surface-container-lowest p-space-lg shadow-[0_1px_3px_rgba(25,25,27,0.03)] flex flex-col gap-space-md border border-border-subtle/30">
-            <div className="flex items-center justify-between pb-space-xs border-b border-surface-container">
+          <div className="rounded-xl bg-bg-surface p-space-lg shadow-sm flex flex-col gap-space-md border border-border-subtle/40">
+            <div className="flex items-center justify-between pb-space-xs border-b border-border-subtle/20">
               <div className="flex flex-col">
-                <span className="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">
+                <span className="font-label-sm text-label-sm uppercase tracking-wider text-text-tertiary font-semibold">
                   Active Task Breakdown
                 </span>
-                <h2 className="font-headline-sm text-headline-sm text-on-surface font-semibold">
+                <h2 className="font-headline-sm text-headline-sm text-text-primary font-semibold">
                   Execution Sequence
                 </h2>
               </div>
-              <span className="px-space-sm py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-md text-label-md font-semibold">
+              <span className="px-space-sm py-0.5 rounded-full bg-brand-tint text-brand-strong font-label-md text-label-md font-semibold">
                 {completedSubtasksCount} of {totalSubtasksCount} Finished
               </span>
             </div>
 
             {/* Sequence Steps */}
-            <div className="flex flex-col gap-space-sm">
+            <div className="flex flex-col gap-2.5">
               {currentSubtasks.map((step, index) => {
                 const isStepCompleted = step.completed;
                 const isCurrentActive = !isStepCompleted && currentSubtasks.slice(0, index).every((s) => s.completed);
@@ -676,26 +700,26 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                   return (
                     <div
                       key={step.id}
-                      className="p-space-sm rounded-lg bg-surface-container-low flex items-start gap-space-sm opacity-80"
+                      className="p-3 rounded-lg bg-bg-sunken/40 border border-border-subtle/20 flex items-start gap-3 opacity-70 hover:opacity-90 transition-opacity"
                     >
                       <button
                         type="button"
                         onClick={() => hasRealSubtasks && activeTask && toggleSubtask(activeTask.id, step.id)}
-                        className="w-5 h-5 rounded bg-secondary flex items-center justify-center text-on-secondary mt-0.5 shrink-0 cursor-pointer"
+                        className="w-5 h-5 rounded bg-success flex items-center justify-center text-white mt-0.5 shrink-0 cursor-pointer"
                         aria-label={`Uncheck ${step.title}`}
                       >
                         <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                       </button>
                       <div className="flex flex-col flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <span className="font-title-sm text-title-sm text-on-surface-variant line-through truncate font-medium">
+                          <span className="font-title-sm text-title-sm text-text-secondary line-through break-words font-medium">
                             {index + 1}. {step.title}
                           </span>
-                          <span className="font-label-sm text-label-sm text-secondary font-medium shrink-0 ml-2">
+                          <span className="font-label-sm text-xs text-success font-medium shrink-0 ml-2">
                             Done
                           </span>
                         </div>
-                        <p className="font-body-sm text-body-sm text-outline mt-0.5 line-clamp-1">
+                        <p className="font-body-sm text-xs text-text-tertiary mt-0.5 line-clamp-1">
                           {'note' in step ? step.note : 'Subtask completed successfully.'}
                         </p>
                       </div>
@@ -707,30 +731,31 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                   return (
                     <div
                       key={step.id}
-                      className="relative p-space-md rounded-xl bg-surface-container-lowest shadow-[0_4px_16px_rgba(59,73,223,0.08)] flex flex-col gap-space-xs border border-primary-fixed/60"
+                      className="relative p-4 rounded-xl bg-brand-tint/10 shadow-xs flex flex-col gap-1.5 border border-brand/40"
                     >
-                      <div className="absolute left-0 top-3 bottom-3 w-1 bg-primary-container rounded-r"></div>
+                      <div className="absolute left-0 top-3 bottom-3 w-1 bg-brand rounded-r"></div>
                       <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-space-xs">
-                          <span className="px-space-xs py-space-xxs rounded bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm font-semibold uppercase">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded bg-brand-tint text-brand-strong font-label-sm text-xs font-semibold uppercase tracking-wider">
                             Current Step
                           </span>
-                          <span className="font-title-md text-title-md text-on-surface font-semibold">
+                          <span className="font-title-md text-title-md text-text-primary font-semibold">
                             {index + 1}. {step.title}
                           </span>
                         </div>
                         <button
                           type="button"
-                          className="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container text-outline hover:text-on-surface transition-colors cursor-pointer"
+                          className="w-7 h-7 rounded flex items-center justify-center hover:bg-bg-sunken text-text-tertiary hover:text-text-primary transition-colors cursor-pointer"
                           aria-label="Step options"
                         >
                           <MoreHorizontal className="w-4 h-4" />
                         </button>
                       </div>
-                      <p className="font-body-sm text-body-sm text-on-surface pl-2 mt-1">
+                      <p className="font-body-sm text-body-sm text-text-secondary pl-1 mt-1 leading-relaxed">
                         {'note' in step ? step.note : 'Execute this step focused exclusively on completing its single output.'}
                       </p>
-                      <div className="flex items-center gap-space-sm mt-space-sm pl-2">
+                      {/* Action buttons on their own separated line */}
+                      <div className="flex flex-wrap items-center gap-2.5 mt-3 pt-2.5 border-t border-brand/15 pl-1">
                         <button
                           type="button"
                           onClick={() => {
@@ -740,7 +765,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                               step.completed = true;
                             }
                           }}
-                          className="flex items-center gap-space-xxs px-space-sm py-1.5 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md hover:bg-brand transition-colors shadow-sm cursor-pointer"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand text-brand-on font-label-md text-xs sm:text-sm font-semibold hover:bg-brand-strong transition-colors shadow-xs cursor-pointer"
                         >
                           <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                           <span>Mark Step Complete</span>
@@ -748,7 +773,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                         <button
                           type="button"
                           onClick={() => {}}
-                          className="flex items-center gap-space-xxs px-space-sm py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant font-label-md text-label-md transition-colors cursor-pointer"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-bg-surface hover:bg-bg-sunken text-text-secondary hover:text-text-primary font-label-md text-xs sm:text-sm font-medium border border-border-subtle/40 transition-colors cursor-pointer"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
                           <span>Open Notes</span>
@@ -762,21 +787,21 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                 return (
                   <div
                     key={step.id}
-                    className="p-space-sm rounded-lg bg-surface-container-lowest hover:bg-surface-container-low transition-colors flex items-start gap-space-sm border border-transparent hover:border-surface-container"
+                    className="p-3 rounded-lg bg-bg-surface hover:bg-bg-sunken transition-colors flex items-start gap-3 border border-border-subtle/20"
                   >
-                    <div className="w-5 h-5 rounded bg-surface-container-highest flex items-center justify-center text-outline mt-0.5 shrink-0 text-xs font-semibold">
+                    <div className="w-5 h-5 rounded bg-bg-sunken flex items-center justify-center text-text-tertiary mt-0.5 shrink-0 text-xs font-semibold">
                       {index + 1}
                     </div>
                     <div className="flex flex-col flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <span className="font-title-sm text-title-sm text-on-surface font-medium truncate">
+                        <span className="font-title-sm text-title-sm text-text-primary font-medium break-words">
                           {index + 1}. {step.title}
                         </span>
-                        <span className="font-label-sm text-label-sm text-outline shrink-0 ml-2">
+                        <span className="font-label-sm text-xs text-text-tertiary shrink-0 ml-2">
                           {'duration' in step ? step.duration : '~15 mins'}
                         </span>
                       </div>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant mt-0.5 line-clamp-1">
+                      <p className="font-body-sm text-xs text-text-secondary mt-0.5 line-clamp-1">
                         {'note' in step ? step.note : 'Upcoming milestone subtask.'}
                       </p>
                     </div>
@@ -787,25 +812,25 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
           </div>
 
           {/* DISTRACTION VAULT / SCRATCHPAD CARD */}
-          <div className="rounded-xl bg-surface-container-lowest p-space-lg shadow-[0_1px_3px_rgba(25,25,27,0.03)] flex flex-col gap-space-sm border border-border-subtle/30 flex-1">
-            <div className="flex items-center justify-between pb-space-xs border-b border-surface-container">
-              <div className="flex items-center gap-space-xs">
-                <Edit3 className="w-4 h-4 text-primary" />
-                <span className="font-title-sm text-title-sm text-on-surface font-semibold">
+          <div className="rounded-xl bg-bg-surface p-space-lg shadow-sm flex flex-col gap-space-sm border border-border-subtle/40 flex-1">
+            <div className="flex items-center justify-between pb-space-xs border-b border-border-subtle/20">
+              <div className="flex items-center gap-2">
+                <Edit3 className="w-4 h-4 text-brand" />
+                <span className="font-title-sm text-title-sm text-text-primary font-semibold">
                   Distraction Vault / Scratchpad
                 </span>
               </div>
-              <span className="font-label-sm text-label-sm text-outline bg-surface-container-low px-2 py-0.5 rounded-full">
+              <span className="font-label-sm text-xs text-text-tertiary bg-bg-sunken px-2.5 py-0.5 rounded-full border border-border-subtle/30">
                 Auto-saved
               </span>
             </div>
 
-            <p className="font-body-sm text-body-sm text-on-surface-variant">
+            <p className="font-body-sm text-body-sm text-text-secondary leading-relaxed">
               Divert disruptive thoughts, random errands, or sudden ideas here without opening new tabs.
             </p>
 
-            {/* Scratchpad Textarea */}
-            <div className="relative flex-1 mt-space-xs">
+            {/* Scratchpad Textarea with comfortable padding */}
+            <div className="relative flex-1 mt-1">
               <label htmlFor="scratchpad-area" className="sr-only">
                 Distraction vault notes
               </label>
@@ -815,7 +840,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                 onChange={(e) => setScratchpadText(e.target.value)}
                 placeholder="• Remember to email Dr. Vasquez about citation style...&#10;• Check library reserve shelf 4B tomorrow&#10;• Quick thought: tie cognitive bandwidth to smartphone notifications in section 2"
                 rows={6}
-                className="w-full p-space-sm rounded-lg bg-surface-container text-on-surface font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-lowest shadow-inner resize-none transition-all placeholder:text-outline border border-transparent focus:border-primary/30"
+                className="w-full p-3.5 rounded-xl bg-bg-sunken text-text-primary font-body-sm text-body-sm focus:outline-none focus:bg-bg-surface focus:ring-2 focus:ring-brand shadow-inner resize-none transition-all placeholder:text-text-tertiary border border-border-subtle/30 leading-relaxed"
               />
             </div>
 
@@ -826,36 +851,36 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
               </div>
             )}
 
-            <div className="flex items-center justify-between pt-space-xs font-label-sm text-label-sm text-on-surface-variant">
+            <div className="flex items-center justify-between pt-2 font-label-sm text-label-sm text-text-secondary border-t border-border-subtle/15">
               <span>{thoughtsCount} thoughts buffered</span>
               <button
                 type="button"
                 id="clear-scratch-btn"
                 onClick={handleTransferToInbox}
-                className="hover:text-primary transition-colors cursor-pointer font-semibold flex items-center gap-1"
+                className="text-brand hover:text-brand-strong transition-colors cursor-pointer font-semibold flex items-center gap-1.5 py-1 px-2 rounded-md hover:bg-brand-tint/40"
               >
-                <Send className="w-3 h-3" />
+                <Send className="w-3.5 h-3.5" />
                 <span>Transfer to Inbox</span>
               </button>
             </div>
           </div>
 
-          {/* THESIS CONTEXT MICRO-CARD */}
-          <div className="rounded-xl bg-surface-container-low p-space-md flex items-center justify-between border border-border-subtle/30">
-            <div className="flex items-center gap-space-sm">
-              <div className="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary shadow-sm font-semibold shrink-0">
-                <School className="w-5 h-5 text-primary" />
+          {/* THESIS CONTEXT MICRO-CARD (Separated icon, title, description, badge) */}
+          <div className="rounded-xl bg-bg-surface p-4 flex items-center justify-between border border-border-subtle/40 shadow-xs">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-11 h-11 rounded-xl bg-brand-tint flex items-center justify-center text-brand shadow-xs font-semibold shrink-0">
+                <School className="w-5 h-5 text-brand" />
               </div>
-              <div className="flex flex-col">
-                <span className="font-title-sm text-title-sm text-on-surface font-semibold">
+              <div className="flex flex-col min-w-0">
+                <span className="font-title-sm text-title-sm text-text-primary font-semibold truncate">
                   Thesis Advisor Checkpoint
                 </span>
-                <span className="font-body-sm text-body-sm text-on-surface-variant">
+                <span className="font-body-sm text-xs sm:text-sm text-text-secondary leading-snug line-clamp-1">
                   Draft review submission deadline is Thursday 5:00 PM
                 </span>
               </div>
             </div>
-            <span className="px-space-xs py-space-xxs rounded bg-surface-container-lowest text-outline font-label-sm text-label-sm font-semibold shrink-0 ml-2">
+            <span className="px-3 py-1 rounded-lg bg-bg-sunken text-text-tertiary border border-border-subtle/30 font-label-sm text-xs font-semibold shrink-0 ml-3">
               48h left
             </span>
           </div>
@@ -865,12 +890,15 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
       {/* 3. EXIT CONFIRMATION MODAL */}
       {showExitConfirm && (
         <div
-          className="fixed inset-0 bg-inverse-surface/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[100] flex items-center justify-center p-4 animate-fade-in"
           id="exit-modal"
           role="dialog"
           aria-modal="true"
         >
-          <div className="bg-surface-container-lowest rounded-xl max-w-md w-full p-space-xl shadow-[0_12px_32px_rgba(25,25,27,0.12)] flex flex-col gap-space-md border border-border-subtle/40 animate-fade-in">
+          <div
+            className="bg-white bg-bg-surface modal-surface rounded-2xl max-w-md w-full p-6 shadow-[0_20px_50px_rgba(0,0,0,0.25)] flex flex-col gap-4 border border-border-subtle animate-fade-in text-text-primary"
+            style={{ backgroundColor: '#FFFFFF' }}
+          >
             <div className="flex items-center gap-space-sm text-secondary">
               <div className="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center text-tertiary shrink-0">
                 <Coffee className="w-5 h-5" />
@@ -914,12 +942,15 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
       {/* 4. SESSION ACCOMPLISHED MODAL */}
       {isSessionComplete && (
         <div
-          className="fixed inset-0 bg-inverse-surface/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[100] flex items-center justify-center p-4 animate-fade-in"
           id="complete-modal"
           role="dialog"
           aria-modal="true"
         >
-          <div className="bg-surface-container-lowest rounded-xl max-w-lg w-full p-space-xl shadow-[0_16px_40px_rgba(25,25,27,0.14)] flex flex-col gap-space-lg border border-border-subtle/40 animate-fade-in">
+          <div
+            className="bg-white bg-bg-surface modal-surface rounded-2xl max-w-lg w-full p-6 shadow-[0_20px_50px_rgba(0,0,0,0.25)] flex flex-col gap-5 border border-border-subtle animate-fade-in text-text-primary"
+            style={{ backgroundColor: '#FFFFFF' }}
+          >
             <div className="flex items-center justify-between pb-space-xs border-b border-surface-container">
               <div className="flex items-center gap-space-sm">
                 <div className="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed shrink-0">

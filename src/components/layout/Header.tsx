@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
           <Menu className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center gap-1.5 text-text-tertiary font-label-md text-[12px]">
+        <div className="flex items-center gap-1.5 text-text-tertiary font-label-md text-label-md">
           <GraduationCap className="w-4 h-4 text-text-tertiary shrink-0" />
           <span>Studio</span>
           <span className="text-border-strong font-light mx-1">/</span>
@@ -49,7 +49,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Right: Date, Search, Notifications */}
       <div className="flex items-center gap-3 sm:gap-4">
-        <div className="flex items-center gap-1.5 text-text-secondary font-label-md text-[12px]">
+        <div className="flex items-center gap-1.5 text-text-secondary font-label-md text-label-md">
           <Calendar className="w-4 h-4 text-text-tertiary shrink-0" />
           <span className="hidden sm:inline">{formattedDate}</span>
           <span className="sm:hidden">{today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
