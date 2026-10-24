@@ -1,5 +1,6 @@
 import React from 'react';
 import { Task } from '../../domain/types';
+import { getDaysDifference, getLocalDateString } from '../../domain/recommendationEngine';
 import {
   Check,
   AlertTriangle,
@@ -23,12 +24,14 @@ export const TodayTaskRow: React.FC<TodayTaskRowProps> = ({
   onEditTask,
 }) => {
   const completedSubtasks = task.subtasks.filter((s) => s.completed).length;
-  const courseTag = task.tags && task.tags.length > 0 ? task.tags[0] : 'COGSCI 210';
+  const courseTag = task.tags && task.tags.length > 0 ? task.tags[0] : (task.isFocusPinned ? 'Focus Pin' : 'Task');
   const isUrgent = task.priority === 'urgent';
 
   // Format deadline badge
-  const todayStr = new Date().toISOString().split('T')[0];
-  const isOverdue = task.dueDate && task.dueDate < todayStr && !task.completed;
+  const todayStr = getLocalDateString();
+  const daysDiff = task.dueDate ? getDaysDifference(task.dueDate, todayStr) : NaN;
+  const isOverdue = !isNaN(daysDiff) && daysDiff < 0 && !task.completed;
+  const overdueDays = isOverdue ? Math.abs(daysDiff) : 0;
   const isDueToday = task.dueDate === todayStr;
 
   return (
@@ -69,7 +72,7 @@ export const TodayTaskRow: React.FC<TodayTaskRowProps> = ({
                 <span className="text-text-tertiary/60 select-none">•</span>
                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-danger-bg text-danger font-label-sm text-label-sm font-medium">
                   <AlertTriangle className="w-3.5 h-3.5" />
-                  Overdue • 1 day
+                  Overdue • {overdueDays} day{overdueDays === 1 ? '' : 's'}
                 </span>
               </>
             )}
@@ -79,7 +82,7 @@ export const TodayTaskRow: React.FC<TodayTaskRowProps> = ({
                 <span className="text-text-tertiary/60 select-none">•</span>
                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-warning-bg text-warning font-label-sm text-label-sm font-medium">
                   <Clock className="w-3.5 h-3.5" />
-                  Due today • 5:00 PM
+                  Due today
                 </span>
               </>
             )}

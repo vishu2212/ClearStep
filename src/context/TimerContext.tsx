@@ -23,6 +23,7 @@ interface TimerContextType {
   completeSessionNow: () => void;
   dismissCompleteModal: () => void;
   clearSessionHistory: () => void;
+  reloadSessionsFromStorage: () => void;
 }
 
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
@@ -55,14 +56,34 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Wall-clock tracking refs for background tab immunity
   const startTimeRef = useRef<number | null>(null);
   const pausedRemainingRef = useRef<number>(getDurationForMode('focus'));
+  const isCompletingRef = useRef<boolean>(false);
+
+  const prevPrefsRef = useRef({
+    focus: preferences.focusDuration,
+    shortBreak: preferences.shortBreakDuration,
+    longBreak: preferences.longBreakDuration,
+  });
 
   // When preferences change and timer is not running, update durations
   useEffect(() => {
-    if (!isRunning) {
-      const dur = getDurationForMode(mode);
-      setTargetSeconds(dur);
-      setRemainingSeconds(dur);
-      pausedRemainingRef.current = dur;
+    const prefsChanged =
+      prevPrefsRef.current.focus !== preferences.focusDuration ||
+      prevPrefsRef.current.shortBreak !== preferences.shortBreakDuration ||
+      prevPrefsRef.current.longBreak !== preferences.longBreakDuration;
+
+    if (prefsChanged) {
+      prevPrefsRef.current = {
+        focus: preferences.focusDuration,
+        shortBreak: preferences.shortBreakDuration,
+        longBreak: preferences.longBreakDuration,
+      };
+
+      if (!isRunning) {
+        const dur = getDurationForMode(mode);
+        setTargetSeconds(dur);
+        setRemainingSeconds(dur);
+        pausedRemainingRef.current = dur;
+      }
     }
   }, [preferences.focusDuration, preferences.shortBreakDuration, preferences.longBreakDuration, mode, isRunning]);
 
@@ -82,6 +103,8 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (remaining <= 0) {
         // Session Complete!
         clearInterval(interval);
+        if (isCompletingRef.current) return;
+        isCompletingRef.current = true;
         setIsRunning(false);
         setRemainingSeconds(0);
         setIsSessionComplete(true);
@@ -90,7 +113,7 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (mode === 'focus') {
           const durationMins = Math.max(1, Math.round(targetSeconds / 60));
           const newSession: FocusSession = {
-            id: `session-${Date.now()}`,
+            id: `session-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
             taskId: activeTaskId,
             taskTitle: activeTaskTitle || 'Independent Focus Session',
             mode: 'focus',
@@ -98,11 +121,11 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             completedAt: new Date().toISOString(),
           };
 
-          setSessions((prev) => {
-            const next = [newSession, ...prev];
-            const store = loadFromLocalStorage().store;
-            store.sessions = next;
-            saveToLocalStorage(store);
+          setSessions(() => {
+            const currentStore = loadFromLocalStorage().store;
+            const next = [newSession, ...currentStore.sessions.filter((s) => s.id !== newSession.id)];
+            currentStore.sessions = next;
+            saveToLocalStorage(currentStore);
             return next;
           });
         }
@@ -125,13 +148,51 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     startTimeRef.current = Date.now();
     setIsRunning(true);
     setIsSessionComplete(false);
+    isCompletingRef.current = false;
   };
 
   const pauseTimer = () => {
     if (!isRunning) return;
+
+    const actualRemaining =
+      startTimeRef.current !== null
+        ? calculateRemainingSeconds(startTimeRef.current, pausedRemainingRef.current, Date.now())
+        : remainingSeconds;
+
     setIsRunning(false);
-    pausedRemainingRef.current = remainingSeconds;
     startTimeRef.current = null;
+
+    if (actualRemaining <= 0) {
+      if (!isCompletingRef.current) {
+        isCompletingRef.current = true;
+        setRemainingSeconds(0);
+        pausedRemainingRef.current = 0;
+        setIsSessionComplete(true);
+
+        if (mode === 'focus') {
+          const durationMins = Math.max(1, Math.round(targetSeconds / 60));
+          const newSession: FocusSession = {
+            id: `session-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+            taskId: activeTaskId,
+            taskTitle: activeTaskTitle || 'Independent Focus Session',
+            mode: 'focus',
+            durationMinutes: durationMins,
+            completedAt: new Date().toISOString(),
+          };
+
+          setSessions(() => {
+            const currentStore = loadFromLocalStorage().store;
+            const next = [newSession, ...currentStore.sessions.filter((s) => s.id !== newSession.id)];
+            currentStore.sessions = next;
+            saveToLocalStorage(currentStore);
+            return next;
+          });
+        }
+      }
+    } else {
+      pausedRemainingRef.current = actualRemaining;
+      setRemainingSeconds(actualRemaining);
+    }
   };
 
   const resumeTimer = () => {
@@ -148,6 +209,7 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setRemainingSeconds(dur);
     pausedRemainingRef.current = dur;
     setIsSessionComplete(false);
+    isCompletingRef.current = false;
   };
 
   const switchMode = (newMode: FocusMode) => {
@@ -161,32 +223,43 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setIsSessionComplete(false);
     setActiveTaskId(null);
     setActiveTaskTitle(null);
+    isCompletingRef.current = false;
   };
 
   const addSeconds = (secs: number) => {
+    if (!Number.isFinite(secs) || secs <= 0) return;
     const currentRemaining =
       isRunning && startTimeRef.current !== null
         ? calculateRemainingSeconds(startTimeRef.current, pausedRemainingRef.current, Date.now())
         : pausedRemainingRef.current;
-    const next = Math.max(0, currentRemaining + secs);
+    const next = Math.min(14400, Math.max(0, currentRemaining + secs));
     pausedRemainingRef.current = next;
     if (isRunning) {
       startTimeRef.current = Date.now();
     }
-    setTargetSeconds((prev) => Math.max(1, prev + secs));
+    setTargetSeconds((prev) => Math.min(14400, Math.max(60, prev + secs)));
     setRemainingSeconds(next);
   };
 
   const completeSessionNow = () => {
+    if (isCompletingRef.current) return;
+    isCompletingRef.current = true;
+
+    const actualRemaining =
+      isRunning && startTimeRef.current !== null
+        ? calculateRemainingSeconds(startTimeRef.current, pausedRemainingRef.current, Date.now())
+        : remainingSeconds;
+
     setIsRunning(false);
     setRemainingSeconds(0);
+    pausedRemainingRef.current = 0;
     startTimeRef.current = null;
     setIsSessionComplete(true);
 
     if (mode === 'focus') {
-      const elapsedMins = Math.max(1, Math.round((targetSeconds - remainingSeconds) / 60));
+      const elapsedMins = Math.max(1, Math.round((targetSeconds - actualRemaining) / 60));
       const newSession: FocusSession = {
-        id: `session-${Date.now()}`,
+        id: `session-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
         taskId: activeTaskId,
         taskTitle: activeTaskTitle || 'Independent Focus Session',
         mode: 'focus',
@@ -194,11 +267,11 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         completedAt: new Date().toISOString(),
       };
 
-      setSessions((prev) => {
-        const next = [newSession, ...prev];
-        const store = loadFromLocalStorage().store;
-        store.sessions = next;
-        saveToLocalStorage(store);
+      setSessions(() => {
+        const currentStore = loadFromLocalStorage().store;
+        const next = [newSession, ...currentStore.sessions.filter((s) => s.id !== newSession.id)];
+        currentStore.sessions = next;
+        saveToLocalStorage(currentStore);
         return next;
       });
     }
@@ -221,6 +294,23 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const store = loadFromLocalStorage().store;
     store.sessions = [];
     saveToLocalStorage(store);
+  };
+
+  const reloadSessionsFromStorage = () => {
+    if (isRunning) {
+      setIsRunning(false);
+      startTimeRef.current = null;
+    }
+    const store = loadFromLocalStorage().store;
+    setSessions(store.sessions);
+    const dur = getDurationForMode(mode);
+    setTargetSeconds(dur);
+    setRemainingSeconds(dur);
+    pausedRemainingRef.current = dur;
+    setIsSessionComplete(false);
+    setActiveTaskId(null);
+    setActiveTaskTitle(null);
+    isCompletingRef.current = false;
   };
 
   const progressPercent = calculateTimerProgress(remainingSeconds, targetSeconds);
@@ -246,6 +336,7 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         completeSessionNow,
         dismissCompleteModal,
         clearSessionHistory,
+        reloadSessionsFromStorage,
       }}
     >
       {children}

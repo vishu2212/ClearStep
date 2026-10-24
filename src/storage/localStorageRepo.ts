@@ -1,4 +1,12 @@
-import { AppStore, AppStoreSchema } from '../domain/types';
+import {
+  AppStore,
+  AppStoreSchema,
+  Task,
+  TaskSchema,
+  FocusSession,
+  FocusSessionSchema,
+  UserPreferencesSchema,
+} from '../domain/types';
 import { getInitialSeedData } from './seedData';
 
 export const STORAGE_KEY = 'clearstep_v1_store';
@@ -79,7 +87,8 @@ export function loadFromLocalStorage(): StorageLoadResult {
       }
 
       console.warn('Storage schema validation failed. Backed up corrupted data to:', backupSuccess ? backupKey : 'none', result.error);
-      const fallback = getInitialSeedData();
+      const salvaged = salvageOrMigrateStore(parsedJson);
+      const fallback = salvaged || getInitialSeedData();
       saveToLocalStorage(fallback);
       return {
         store: fallback,
@@ -94,6 +103,61 @@ export function loadFromLocalStorage(): StorageLoadResult {
     const fallback = getInitialSeedData();
     return { store: fallback, recoveredFromCorrupt: true, backupSuccess: false };
   }
+}
+
+/**
+ * Salvages valid tasks, focus sessions, and user preferences from partially corrupted
+ * or unversioned store objects to prevent destructive loss of user work.
+ */
+export function salvageOrMigrateStore(rawJson: unknown): AppStore | null {
+  if (typeof rawJson !== 'object' || rawJson === null) return null;
+  const obj = rawJson as Record<string, unknown>;
+
+  const seed = getInitialSeedData();
+  const hasTasksArray = Array.isArray(obj.tasks);
+  let salvagedTasks: Task[] = [];
+  if (hasTasksArray) {
+    salvagedTasks = (obj.tasks as unknown[])
+      .map((t) => TaskSchema.safeParse(t))
+      .filter((r): r is { success: true; data: Task } => r.success)
+      .map((r) => r.data);
+  }
+
+  const hasSessionsArray = Array.isArray(obj.sessions);
+  let salvagedSessions: FocusSession[] = [];
+  if (hasSessionsArray) {
+    salvagedSessions = (obj.sessions as unknown[])
+      .map((s) => FocusSessionSchema.safeParse(s))
+      .filter((r): r is { success: true; data: FocusSession } => r.success)
+      .map((r) => r.data);
+  }
+
+  let salvagedPrefs = seed.preferences;
+  let hasValidPrefs = false;
+  if (obj.preferences && typeof obj.preferences === 'object') {
+    const prefResult = UserPreferencesSchema.safeParse(obj.preferences);
+    if (prefResult.success) {
+      salvagedPrefs = prefResult.data;
+      hasValidPrefs = true;
+    }
+  }
+
+  // Salvage if there are valid tasks or sessions, or if the user intentionally had an empty task list with valid sessions/preferences
+  if (
+    salvagedTasks.length > 0 ||
+    salvagedSessions.length > 0 ||
+    (hasTasksArray && (salvagedSessions.length > 0 || hasValidPrefs))
+  ) {
+    return {
+      schemaVersion: 1,
+      tasks: hasTasksArray ? salvagedTasks : seed.tasks,
+      sessions: salvagedSessions,
+      preferences: salvagedPrefs,
+      lastUpdated: new Date().toISOString(),
+    };
+  }
+
+  return null;
 }
 
 /**
@@ -140,27 +204,49 @@ export function exportBackupJson(store: AppStore): string {
 }
 
 /**
- * Validates and imports a JSON backup string
+ * Validates a JSON backup string without persisting it to storage.
  */
-export function importBackupJson(rawJson: string): { success: boolean; store?: AppStore; error?: string } {
+export function validateBackupJson(rawJson: string): { success: boolean; data?: AppStore; error?: string } {
   try {
     const parsed = JSON.parse(rawJson);
     const result = AppStoreSchema.safeParse(parsed);
-    if (!result.success) {
-      return {
-        success: false,
-        error: `Invalid backup format: ${result.error.issues.map((i) => i.message).join(', ')}`,
-      };
+    if (result.success) {
+      return { success: true, data: result.data };
     }
-    const saveRes = saveToLocalStorage(result.data);
-    if (!saveRes.success) {
-      return {
-        success: false,
-        error: saveRes.error || 'Failed to persist imported data to local storage.',
-      };
+    const salvaged = salvageOrMigrateStore(parsed);
+    if (salvaged) {
+      return { success: true, data: salvaged };
     }
-    return { success: true, store: result.data };
+    return {
+      success: false,
+      error: `Invalid backup schema: ${result.error.issues.map((i) => i.message).join(', ')}`,
+    };
   } catch {
     return { success: false, error: 'The provided file is not valid JSON.' };
   }
+}
+
+/**
+ * Commits a validated AppStore directly to localStorage.
+ */
+export function commitImportedStore(store: AppStore): StorageSaveResult {
+  return saveToLocalStorage(store);
+}
+
+/**
+ * Validates and imports a JSON backup string (composite helper for backwards compatibility)
+ */
+export function importBackupJson(rawJson: string): { success: boolean; store?: AppStore; error?: string } {
+  const validation = validateBackupJson(rawJson);
+  if (!validation.success || !validation.data) {
+    return { success: false, error: validation.error || 'Failed to validate backup.' };
+  }
+  const saveRes = commitImportedStore(validation.data);
+  if (!saveRes.success) {
+    return {
+      success: false,
+      error: saveRes.error || 'Failed to persist imported data to local storage.',
+    };
+  }
+  return { success: true, store: validation.data };
 }

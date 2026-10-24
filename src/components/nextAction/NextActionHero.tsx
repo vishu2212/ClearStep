@@ -1,5 +1,7 @@
 import React from 'react';
 import { useTasks } from '../../context/TaskContext';
+import { usePreferences } from '../../context/PreferencesContext';
+import { getLocalDateString, getDaysDifference } from '../../domain/recommendationEngine';
 import {
   Play,
   Maximize2,
@@ -27,6 +29,7 @@ export const NextActionHero: React.FC<NextActionHeroProps> = ({
 }) => {
   const { recommendation } = useTasks();
   const { recommendedTask, rationale } = recommendation;
+  const { preferences } = usePreferences();
 
   if (!recommendedTask) {
     return (
@@ -66,23 +69,35 @@ export const NextActionHero: React.FC<NextActionHeroProps> = ({
     .map((r) => r.trim())
     .filter(Boolean);
 
-  const rationaleBullets = rawBullets.length > 0 ? rawBullets : [
-    `Due in 2 days — highest deadline proximity among active coursework`,
-    `High priority thesis milestone unlocking 2 downstream sections`,
-    `Estimated ~35 min focused block to complete first subtask`,
-  ];
+  const rationaleBullets =
+    rawBullets.length > 0
+      ? rawBullets
+      : [
+          `Priority level: ${recommendedTask.priority}`,
+          recommendedTask.dueDate ? `Deadline scheduled for ${recommendedTask.dueDate}` : 'Open backlog item with highest readiness',
+          `${recommendedTask.subtasks.length} step(s) recorded`,
+        ];
 
   // Course / Tag label from tags or fallback
-  const courseTag = recommendedTask.tags && recommendedTask.tags.length > 0
-    ? recommendedTask.tags.join(' • ')
-    : 'COGSCI 210 • Senior Thesis';
+  const courseTag =
+    recommendedTask.tags && recommendedTask.tags.length > 0
+      ? recommendedTask.tags.join(' • ')
+      : recommendedTask.isFocusPinned
+      ? 'Focus Pin • Priority Commitment'
+      : `${recommendedTask.priority.toUpperCase()} Priority Task`;
 
   // Calculate deadline text
-  let deadlineText = 'Due in 2 days (Oct 26)';
+  let deadlineText = 'No set deadline';
   if (recommendedTask.dueDate) {
-    const todayStr = new Date().toISOString().split('T')[0];
-    if (recommendedTask.dueDate === todayStr) {
+    const todayStr = getLocalDateString();
+    const diff = getDaysDifference(recommendedTask.dueDate, todayStr);
+    if (diff === 0) {
       deadlineText = 'Due today';
+    } else if (diff === 1) {
+      deadlineText = 'Due tomorrow';
+    } else if (diff < 0) {
+      const daysOver = Math.abs(diff);
+      deadlineText = `Overdue by ${daysOver} day${daysOver === 1 ? '' : 's'}`;
     } else {
       deadlineText = `Due ${recommendedTask.dueDate}`;
     }
@@ -167,7 +182,7 @@ export const NextActionHero: React.FC<NextActionHeroProps> = ({
               type="button"
             >
               <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
-              <span>Start focus (35 min)</span>
+              <span>Start focus ({preferences.focusDuration} min)</span>
               <span className="text-xs px-1.5 py-0.5 rounded bg-accent-on/15 font-mono ml-0.5 font-normal tracking-normal">
                 [Space]
               </span>

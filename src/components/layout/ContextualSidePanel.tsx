@@ -1,16 +1,20 @@
 import React from 'react';
 import { useTasks } from '../../context/TaskContext';
+import { getLocalDateString, getDaysDifference } from '../../domain/recommendationEngine';
 import { ShieldCheck, Zap } from 'lucide-react';
 
 export const ContextualSidePanel: React.FC = () => {
   const { tasks } = useTasks();
 
-  // Compute upcoming tasks for the next 7 days
-  const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
+  // Compute upcoming tasks for the next 7 calendar days
+  const todayStr = getLocalDateString();
 
   const upcomingTasks = tasks
-    .filter((t) => !t.completed && t.dueDate && t.dueDate > todayStr)
+    .filter((t) => {
+      if (t.completed || !t.dueDate) return false;
+      const diff = getDaysDifference(t.dueDate, todayStr);
+      return !isNaN(diff) && diff > 0 && diff <= 7;
+    })
     .sort((a, b) => (a.dueDate || '').localeCompare(b.dueDate || ''))
     .slice(0, 5);
 
@@ -18,8 +22,8 @@ export const ContextualSidePanel: React.FC = () => {
   const groupedTasks: { dateLabel: string; items: typeof upcomingTasks }[] = [];
   upcomingTasks.forEach((task) => {
     if (!task.dueDate) return;
+    const dayDiff = getDaysDifference(task.dueDate, todayStr);
     const taskDate = new Date(task.dueDate + 'T00:00:00');
-    const dayDiff = Math.round((taskDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
     let label = task.dueDate;
     if (dayDiff === 1) {
@@ -77,13 +81,11 @@ export const ContextualSidePanel: React.FC = () => {
                       {/* Line 2: Separated Category & Due Time Metadata */}
                       <div className="flex items-center justify-between font-label-sm text-label-sm pt-1 border-t border-border-subtle/20 text-text-tertiary">
                         <span className="font-medium text-text-secondary truncate max-w-[160px]">
-                          {item.tags?.[0] || 'COGSCI 210'}
+                          {item.tags?.[0] || 'Task'}
                         </span>
-                        {item.priority === 'urgent' ? (
-                          <span className="text-danger font-medium shrink-0 ml-2">Due at 11:59 PM</span>
-                        ) : (
-                          <span className="text-text-tertiary shrink-0 ml-2">Due at 5:00 PM</span>
-                        )}
+                        <span className={`shrink-0 ml-2 capitalize font-medium ${item.priority === 'urgent' ? 'text-danger' : 'text-text-tertiary'}`}>
+                          {item.priority} priority
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -101,7 +103,7 @@ export const ContextualSidePanel: React.FC = () => {
           <span>Deterministic Schedule</span>
         </div>
         <p className="font-body-sm text-body-sm text-text-secondary leading-relaxed">
-          ClearStep prioritizes single tasks strictly using deadline proximity, milestone dependencies, and estimated focus capacity. No hidden algorithms.
+          ClearStep prioritizes single tasks strictly using manual focus pins, deadline proximity, task urgency, subtask momentum, and task age. No hidden algorithms.
         </p>
         <div className="pt-2 flex items-center justify-between text-text-tertiary font-label-sm text-[11px]">
           <span className="flex items-center gap-1 font-medium">

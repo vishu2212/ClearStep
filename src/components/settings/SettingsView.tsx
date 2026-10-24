@@ -12,13 +12,21 @@ import {
 } from 'lucide-react';
 import { usePreferences } from '../../context/PreferencesContext';
 import { useTasks } from '../../context/TaskContext';
-import { loadFromLocalStorage, exportBackupJson, importBackupJson, saveToLocalStorage } from '../../storage/localStorageRepo';
+import { useTimer } from '../../context/TimerContext';
+import {
+  loadFromLocalStorage,
+  exportBackupJson,
+  validateBackupJson,
+  commitImportedStore,
+  saveToLocalStorage,
+} from '../../storage/localStorageRepo';
 import { getInitialSeedData } from '../../storage/seedData';
 import { Button } from '../common/Button';
 
 export const SettingsView: React.FC = () => {
   const { preferences, updatePreferences, setTheme, resetPreferences } = usePreferences();
   const { reloadFromStorage } = useTasks();
+  const { reloadSessionsFromStorage } = useTimer();
 
   const [importStatus, setImportStatus] = useState<{ success: boolean; message: string } | null>(null);
 
@@ -43,11 +51,17 @@ export const SettingsView: React.FC = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const content = event.target?.result as string;
-      const res = importBackupJson(content);
-      if (res.success && res.store) {
-        setImportStatus({ success: true, message: 'Backup imported successfully! Data refreshed.' });
-        updatePreferences(res.store.preferences);
-        reloadFromStorage();
+      const res = validateBackupJson(content);
+      if (res.success && res.data) {
+        const saveRes = commitImportedStore(res.data);
+        if (saveRes.success) {
+          setImportStatus({ success: true, message: 'Backup imported successfully! Data refreshed.' });
+          updatePreferences(res.data.preferences);
+          reloadFromStorage();
+          reloadSessionsFromStorage();
+        } else {
+          setImportStatus({ success: false, message: saveRes.error || 'Failed to save imported backup.' });
+        }
       } else {
         setImportStatus({ success: false, message: res.error || 'Failed to parse backup.' });
       }
@@ -59,10 +73,15 @@ export const SettingsView: React.FC = () => {
   const handleResetToDemo = () => {
     if (confirm('Reset application to starter demonstration data? All current tasks will be replaced.')) {
       const initial = getInitialSeedData();
-      saveToLocalStorage(initial);
-      updatePreferences(initial.preferences);
-      reloadFromStorage();
-      setImportStatus({ success: true, message: 'Reset to sample demonstration data.' });
+      const saveRes = saveToLocalStorage(initial);
+      if (saveRes.success) {
+        updatePreferences(initial.preferences);
+        reloadFromStorage();
+        reloadSessionsFromStorage();
+        setImportStatus({ success: true, message: 'Reset to sample demonstration data.' });
+      } else {
+        setImportStatus({ success: false, message: saveRes.error || 'Failed to reset demonstration data.' });
+      }
     }
   };
 
@@ -117,8 +136,7 @@ export const SettingsView: React.FC = () => {
               id="focus-dur"
               value={preferences.focusDuration}
               onChange={(e) => updatePreferences({ focusDuration: Number(e.target.value) })}
-              className="w-full font-body-md text-body-md px-3 py-2 rounded-xl border border-border-subtle/40 bg-white bg-bg-surface text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-              style={{ backgroundColor: '#FFFFFF' }}
+              className="w-full font-body-md text-body-md px-3 py-2 rounded-xl border border-border-subtle/40 bg-bg-surface text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             >
               <option value={15}>15 minutes (Gentle)</option>
               <option value={20}>20 minutes</option>
@@ -136,8 +154,7 @@ export const SettingsView: React.FC = () => {
               id="short-break-dur"
               value={preferences.shortBreakDuration}
               onChange={(e) => updatePreferences({ shortBreakDuration: Number(e.target.value) })}
-              className="w-full font-body-md text-body-md px-3 py-2 rounded-xl border border-border-subtle/40 bg-white bg-bg-surface text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-              style={{ backgroundColor: '#FFFFFF' }}
+              className="w-full font-body-md text-body-md px-3 py-2 rounded-xl border border-border-subtle/40 bg-bg-surface text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             >
               <option value={3}>3 minutes</option>
               <option value={5}>5 minutes (Standard)</option>
@@ -153,8 +170,7 @@ export const SettingsView: React.FC = () => {
               id="long-break-dur"
               value={preferences.longBreakDuration}
               onChange={(e) => updatePreferences({ longBreakDuration: Number(e.target.value) })}
-              className="w-full font-body-md text-body-md px-3 py-2 rounded-xl border border-border-subtle/40 bg-white bg-bg-surface text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-              style={{ backgroundColor: '#FFFFFF' }}
+              className="w-full font-body-md text-body-md px-3 py-2 rounded-xl border border-border-subtle/40 bg-bg-surface text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             >
               <option value={10}>10 minutes</option>
               <option value={15}>15 minutes (Standard)</option>

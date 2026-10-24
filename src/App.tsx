@@ -34,28 +34,52 @@ export const App: React.FC = () => {
   const [quickAddTitle, setQuickAddTitle] = useState('');
 
   const { tasks, filteredTasks, createTask, toggleTaskCompletion } = useTasks();
-  const { startTimer } = useTimer();
+  const { startTimer, sessions } = useTimer();
 
-  // Global Keyboard Shortcuts (n for new task, f for focus, Space for focus start, Esc)
+  // Global Keyboard Shortcuts (n for new task, f for focus, / for search, Esc)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const activeTag = (document.activeElement?.tagName || '').toLowerCase();
-      const isInput = activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select';
+      // 1. Never trigger global shortcuts if the task modal is open
+      if (isTaskModalOpen) return;
 
-      if (!isInput) {
-        if (e.key === 'n' || e.key === 'N') {
-          e.preventDefault();
-          setEditingTaskId(null);
-          setIsTaskModalOpen(true);
-        } else if (e.key === 'f' || e.key === 'F') {
-          e.preventDefault();
-          setActiveTab('focus');
-        } else if (e.key === 'Escape') {
-          if (isTaskModalOpen) {
-            setIsTaskModalOpen(false);
-          } else if (activeTab === 'focus') {
-            setActiveTab('today');
-          }
+      // 2. Never trigger if an active dialog or modal overlay is in DOM
+      if (document.querySelector('[role="dialog"], [aria-modal="true"]')) return;
+
+      // 3. Ignore if active element or event target is an input, textarea, select, or contenteditable
+      const target = e.target as HTMLElement | null;
+      const activeEl = document.activeElement as HTMLElement | null;
+      const targetTag = (target?.tagName || '').toLowerCase();
+      const activeTag = (activeEl?.tagName || '').toLowerCase();
+
+      const isInput =
+        targetTag === 'input' ||
+        targetTag === 'textarea' ||
+        targetTag === 'select' ||
+        activeTag === 'input' ||
+        activeTag === 'textarea' ||
+        activeTag === 'select' ||
+        Boolean(target?.isContentEditable) ||
+        Boolean(activeEl?.isContentEditable);
+
+      if (isInput) return;
+
+      if (e.key === 'n' || e.key === 'N') {
+        e.preventDefault();
+        setEditingTaskId(null);
+        setIsTaskModalOpen(true);
+      } else if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        setActiveTab('focus');
+      } else if (e.key === '/') {
+        e.preventDefault();
+        setActiveTab('tasks');
+        setTimeout(() => {
+          const searchInput = document.querySelector<HTMLInputElement>('input[placeholder*="Search"]');
+          searchInput?.focus();
+        }, 50);
+      } else if (e.key === 'Escape') {
+        if (activeTab === 'focus') {
+          setActiveTab('today');
         }
       }
     };
@@ -102,7 +126,13 @@ export const App: React.FC = () => {
   );
 
   const pendingTodayCount = todayTasks.filter((t) => !t.completed).length;
-  const doneTodayCount = tasks.filter((t) => t.completed).length;
+  const doneTodayCount = tasks.filter(
+    (t) => t.completed && t.completedAt && getLocalDateString(new Date(t.completedAt)) === todayStr
+  ).length;
+
+  const todayFocusMinutes = sessions
+    .filter((s) => s.mode === 'focus' && getLocalDateString(new Date(s.completedAt)) === todayStr)
+    .reduce((acc, s) => acc + s.durationMinutes, 0);
 
   // Format date for page title
   const todayDate = new Date();
@@ -261,7 +291,7 @@ export const App: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <Timer className="w-4 h-4 text-brand shrink-0" />
                       <span>
-                        Focused today: <strong className="text-text-primary font-semibold">45 min</strong>
+                        Focused today: <strong className="text-text-primary font-semibold">{todayFocusMinutes > 0 ? `${todayFocusMinutes} min` : '0 min'}</strong>
                       </span>
                     </div>
                     <div className="hidden sm:block w-1 h-1 rounded-full bg-border-strong"></div>

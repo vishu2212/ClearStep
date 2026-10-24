@@ -84,14 +84,14 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
 
   // Active Task details
   const activeTask = activeTaskId ? tasks.find((t) => t.id === activeTaskId) : null;
-  const courseTag = activeTask?.tags?.[0] || 'COGSCI 210';
-  const taskTitle = activeTask?.title || activeTaskTitle || 'Draft Literature Review Outline';
+  const courseTag = activeTask?.tags?.[0] || (activeTask ? 'Task Focus' : activeTaskTitle ? 'Focus Session' : 'Deep Work');
+  const taskTitle = activeTask?.title || activeTaskTitle || 'Independent Focus Session';
 
   // Fallback default subtasks if active task has none
   const defaultSubtasks = [
-    { id: 'sub-1', title: 'Read 2 annotated abstracts', completed: true, note: 'Baddeley (2000) & Miller (1956) memory model cross-references', duration: 'Done at 10:20am' },
-    { id: 'sub-2', title: 'Synthesize 3 core themes', completed: false, note: 'Identify overlaps between cognitive load theory and digital distraction patterns from your notes matrix.', duration: 'Active' },
-    { id: 'sub-3', title: 'Draft 500-word section map', completed: false, note: 'Establish headers for Background, Attentional Decay, and Interventions', duration: '~15 mins' },
+    { id: 'sub-1', title: 'Clarify current focus goal & eliminate distractions', completed: false, note: 'Close unrelated browser tabs and define target deliverable', duration: 'Step 1' },
+    { id: 'sub-2', title: 'Engage in uninterrupted deep work', completed: false, note: 'Sustain single-task focus without context switching', duration: 'Step 2' },
+    { id: 'sub-3', title: 'Review progress & record notes', completed: false, note: 'Capture accomplishments and log remaining questions before break', duration: 'Step 3' },
   ];
 
   const hasRealSubtasks = activeTask && activeTask.subtasks && activeTask.subtasks.length > 0;

@@ -139,7 +139,7 @@ export const ProgressView: React.FC = () => {
 
             return (
               <div key={day.dateStr} className="flex flex-col items-center h-full justify-end group">
-                <span className="font-mono font-label-sm text-label-sm text-text-tertiary mb-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="font-mono font-label-sm text-label-sm text-text-tertiary mb-1 opacity-70 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                   {day.minutes}m
                 </span>
                 <div
