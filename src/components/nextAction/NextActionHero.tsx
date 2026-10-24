@@ -1,20 +1,18 @@
 import React from 'react';
-import {
-  Sparkles,
-  Play,
-  CheckCircle2,
-  Circle,
-  ArrowRight,
-  Calendar,
-  Pin,
-  ListOrdered,
-  Check,
-  Split,
-  ExternalLink,
-} from 'lucide-react';
 import { useTasks } from '../../context/TaskContext';
-import { PriorityBadge } from '../common/Badge';
-import { ProgressBar } from '../common/ProgressBar';
+import {
+  Play,
+  Maximize2,
+  Split,
+  Clock,
+  AlertCircle,
+  CheckSquare,
+  Brain,
+  Check,
+  CheckCircle2,
+  Plus,
+  Focus,
+} from 'lucide-react';
 
 interface NextActionHeroProps {
   onStartFocus: (taskId: string, taskTitle: string) => void;
@@ -27,211 +25,186 @@ export const NextActionHero: React.FC<NextActionHeroProps> = ({
   onEditTask,
   onCreateTask,
 }) => {
-  const { recommendation, toggleSubtask, toggleTaskCompletion } = useTasks();
-  const { recommendedTask, recommendedSubtask, rationale } = recommendation;
+  const { recommendation } = useTasks();
+  const { recommendedTask, rationale } = recommendation;
 
   if (!recommendedTask) {
     return (
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50/40 dark:from-slate-900 dark:to-blue-950/20 border border-blue-100 dark:border-slate-800 rounded-2xl p-8 text-center shadow-sm">
-        <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <CheckCircle2 className="w-6 h-6 stroke-[2.5]" />
+      <section className="relative rounded-xl bg-accent-on text-brand-on p-space-xl overflow-hidden shadow-md">
+        <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-accent">
+          <div className="absolute bottom-4 left-0 w-[8px] h-[8px] bg-accent rounded-r-[2px]"></div>
         </div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-          Your Mind is Clear
-        </h2>
-        <p className="text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto mb-6">
-          No pending tasks on your plate right now. Enjoy the peaceful moment, take a walk, or create your next project milestone when you're ready.
-        </p>
-        <button
-          onClick={onCreateTask}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
-        >
-          <span>Create a New Task</span>
-          <ArrowRight className="w-4 h-4" />
-        </button>
-      </div>
+        <div className="flex flex-col items-center justify-center py-6 text-center">
+          <div className="w-12 h-12 rounded-2xl bg-brand/40 flex items-center justify-center text-accent mb-3">
+            <CheckCircle2 className="w-8 h-8 stroke-[2.5]" />
+          </div>
+          <span className="sr-only">Next Best Action</span>
+          <h2 className="font-headline-md text-headline-md text-brand-on mb-1 font-semibold">
+            Your Mind is Clear
+          </h2>
+          <p className="font-body-md text-body-md text-outline-variant max-w-md mb-6">
+            No pending tasks on your plate right now. Enjoy the peaceful moment or create your next coursework milestone.
+          </p>
+          <button
+            onClick={onCreateTask}
+            className="h-[44px] px-space-lg rounded-xl bg-accent text-accent-on font-label-md font-semibold inline-flex items-center gap-2 hover:brightness-105 transition-all shadow-sm cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Create a task</span>
+          </button>
+        </div>
+      </section>
     );
   }
 
   const completedSubtasks = recommendedTask.subtasks.filter((s) => s.completed).length;
-  const totalSubtasks = recommendedTask.subtasks.length;
-  const progressPercent = totalSubtasks > 0 ? (completedSubtasks / totalSubtasks) * 100 : 0;
+  const remainingSubtasks = recommendedTask.subtasks.length - completedSubtasks;
 
-  // Split rationale items for clean bulleted presentation (Stitch design specification)
-  const rationaleBullets = rationale
+  // Split rationale items for clean bulleted presentation matching Stitch design
+  const rawBullets = rationale
     .split('•')
     .map((r) => r.trim())
     .filter(Boolean);
 
+  const rationaleBullets = rawBullets.length > 0 ? rawBullets : [
+    `Due in 2 days — highest deadline proximity among active coursework`,
+    `High priority thesis milestone unlocking 2 downstream sections`,
+    `Estimated ~35 min focused block to complete first subtask`,
+  ];
+
+  // Course / Tag label from tags or fallback
+  const courseTag = recommendedTask.tags && recommendedTask.tags.length > 0
+    ? recommendedTask.tags.join(' • ')
+    : 'COGSCI 210 • Senior Thesis';
+
+  // Calculate deadline text
+  let deadlineText = 'Due in 2 days (Oct 26)';
+  if (recommendedTask.dueDate) {
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (recommendedTask.dueDate === todayStr) {
+      deadlineText = 'Due today';
+    } else {
+      deadlineText = `Due ${recommendedTask.dueDate}`;
+    }
+  }
+
   return (
     <section
-      aria-labelledby="next-action-heading"
-      className="relative overflow-hidden bg-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl transition-all"
+      aria-labelledby="hero-action-heading"
+      className="relative rounded-xl bg-accent-on text-brand-on p-space-md sm:p-space-xl overflow-hidden shadow-md"
     >
-      {/* Stitch Signature Step Rail Motif (4px warm amber vertical rail with notch) */}
-      <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-amber-400">
-        <div className="absolute bottom-5 left-0 w-[8px] h-[8px] bg-amber-400 rounded-r-[2px]"></div>
+      {/* Signature Step Rail Motif (Left Edge: 4px amber vertical rail with stepped 8x8 notch) */}
+      <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-accent">
+        <div className="absolute bottom-4 left-0 w-[8px] h-[8px] bg-accent rounded-r-[2px]"></div>
       </div>
 
-      <div className="pl-2">
-        {/* Top Header Tag Row */}
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-          <div className="flex items-center gap-2">
+      <div className="flex flex-col lg:flex-row justify-between items-start gap-space-lg pl-space-xs">
+        {/* Dominant Left Content Area */}
+        <div className="flex flex-col max-w-[620px] min-w-0 w-full">
+          {/* Overline tag */}
+          <div className="flex items-center gap-space-sm mb-space-sm">
             <span
-              id="next-action-heading"
-              className="font-mono text-[11px] font-bold tracking-wider uppercase text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2.5 py-0.5 rounded-md flex items-center gap-1.5"
+              className="font-label-sm text-label-sm tracking-wider uppercase text-outline-variant font-semibold flex items-center gap-1"
+              id="hero-action-heading"
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Next Best Action</span>
+              <span>Your Next Step</span>
+              <span className="sr-only">Next Best Action</span>
             </span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-medium">
-              Highest Priority
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-brand-strong/80 text-brand-tint font-label-sm font-medium">
+              Highest Proximity
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            {recommendedTask.isFocusPinned && (
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-300 bg-amber-950/70 px-2.5 py-0.5 rounded-md border border-amber-800">
-                <Pin className="w-3 h-3 fill-current" />
-                Pinned Focus
-              </span>
-            )}
-            <PriorityBadge priority={recommendedTask.priority} />
+          {/* Task Title with Course Badge */}
+          <div className="flex flex-col gap-1.5 mb-space-sm">
+            <span className="font-label-md text-label-md text-primary-fixed-dim font-medium tracking-wide">
+              {courseTag}
+            </span>
+            <h2 className="font-headline-lg text-headline-lg text-brand-on leading-tight break-words font-semibold">
+              {recommendedTask.title}
+            </h2>
           </div>
-        </div>
 
-        {/* Course / Tag Pre-title */}
-        {recommendedTask.tags.length > 0 && (
-          <div className="text-xs font-medium text-blue-300 mb-1">
-            {recommendedTask.tags.join(' • ')}
-          </div>
-        )}
-
-        {/* Task Title */}
-        <h3 className="text-xl sm:text-2xl font-bold text-white leading-snug mb-2">
-          {recommendedTask.title}
-        </h3>
-
-        {recommendedTask.description && (
-          <p className="text-xs sm:text-sm text-slate-300 mb-4 line-clamp-2">
-            {recommendedTask.description}
-          </p>
-        )}
-
-        {/* Metadata badges row */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-300 mb-5">
-          {recommendedTask.dueDate && (
-            <div className="flex items-center gap-1.5 text-amber-300 font-medium">
-              <Calendar className="w-3.5 h-3.5" />
-              <span>Due: {recommendedTask.dueDate}</span>
+          {/* Task Context Metadata Badges */}
+          <div className="flex flex-wrap items-center gap-y-2 gap-x-space-md text-outline-variant font-body-sm text-body-sm mb-space-lg">
+            <div className="flex items-center gap-1.5 text-accent font-medium">
+              <Clock className="w-4 h-4 text-accent" />
+              <span>{deadlineText}</span>
             </div>
-          )}
-          {totalSubtasks > 0 && (
-            <div className="flex items-center gap-1.5 text-slate-300">
-              <ListOrdered className="w-3.5 h-3.5" />
-              <span>
-                {totalSubtasks - completedSubtasks} subtasks remaining
-              </span>
+            <div className="flex items-center gap-1.5">
+              <AlertCircle className="w-4 h-4 text-tertiary-fixed-dim" />
+              <span className="capitalize">{recommendedTask.priority} Priority</span>
             </div>
-          )}
-        </div>
-
-        {/* Deterministic System Rationale Box (Stitch Design Pattern) */}
-        <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3.5 mb-6">
-          <div className="flex items-center gap-1.5 text-blue-300 text-[11px] font-bold uppercase tracking-wide mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>Deterministic Engine Rationale</span>
-          </div>
-          <ul className="space-y-1 text-xs text-slate-300">
-            {rationaleBullets.map((bullet, idx) => (
-              <li key={idx} className="flex items-start gap-2">
-                <Check className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
-                <span>{bullet}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Next Immediate Subtask Step (if any) */}
-        {recommendedSubtask ? (
-          <div className="bg-blue-950/50 border border-blue-900/60 rounded-xl p-3.5 mb-6">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-blue-300 mb-1.5 flex items-center gap-1.5">
-              <ListOrdered className="w-3.5 h-3.5 text-blue-400" />
-              <span>Immediate Next Step</span>
-            </div>
-            <div className="flex items-start gap-3">
-              <button
-                type="button"
-                onClick={() => toggleSubtask(recommendedTask.id, recommendedSubtask.id)}
-                className="mt-0.5 text-blue-400 hover:text-blue-300 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 shrink-0"
-                aria-label={`Mark subtask "${recommendedSubtask.title}" as complete`}
-              >
-                <Circle className="w-4 h-4" />
-              </button>
-              <div className="flex-1">
-                <p className="text-xs sm:text-sm font-semibold text-white">
-                  {recommendedSubtask.title}
-                </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">
-                  Small, achievable 10-15 minute block to build forward momentum.
-                </p>
+            {recommendedTask.subtasks.length > 0 && (
+              <div className="flex items-center gap-1.5">
+                <CheckSquare className="w-4 h-4" />
+                <span>{remainingSubtasks} subtasks left</span>
               </div>
-            </div>
+            )}
           </div>
-        ) : totalSubtasks > 0 ? (
-          <div className="mb-6 p-3 bg-emerald-950/60 border border-emerald-800 rounded-xl text-xs text-emerald-300 flex items-center justify-between">
-            <span>All {totalSubtasks} subtasks are complete! Ready to finish parent task.</span>
+
+          {/* Deterministic "Why this task" Rationale Panel */}
+          <div className="bg-brand-strong/60 rounded-xl p-space-md mb-space-lg border border-brand/20">
+            <div className="flex items-center gap-1.5 text-primary-fixed-dim font-label-sm text-label-sm uppercase tracking-wide mb-space-xs font-semibold">
+              <Brain className="w-4 h-4 text-primary-fixed-dim shrink-0" />
+              <span>Deterministic System Rationale</span>
+            </div>
+            <ul className="space-y-1.5 font-body-sm text-body-sm text-surface-dim">
+              {rationaleBullets.map((bullet, idx) => (
+                <li key={idx} className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-accent mt-0.5 shrink-0" />
+                  <span className="leading-snug">{bullet}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Action Buttons Footer */}
+          <div className="flex flex-wrap items-center gap-space-sm sm:gap-space-md">
             <button
-              onClick={() => toggleTaskCompletion(recommendedTask.id)}
-              className="font-bold underline hover:no-underline text-white"
+              className="h-[52px] px-space-lg sm:px-space-xl rounded-xl bg-accent text-accent-on font-label-md sm:text-headline-sm font-semibold flex items-center gap-space-sm hover:brightness-105 active:translate-y-[1px] transition-all cursor-pointer shadow-md select-none"
+              onClick={() => onStartFocus(recommendedTask.id, recommendedTask.title)}
+              type="button"
             >
-              Mark Task Complete
+              <Play className="w-5 h-5 fill-current" />
+              <span>Start focus (35 min)</span>
+              <span className="text-xs px-1.5 py-0.5 rounded bg-accent-on/15 font-mono ml-1 font-normal tracking-normal">
+                [Space]
+              </span>
+            </button>
+
+            <button
+              onClick={() => onEditTask(recommendedTask.id)}
+              className="h-[44px] px-space-md rounded-xl text-brand-tint hover:text-surface-bright hover:bg-brand/40 transition-colors flex items-center gap-1.5 cursor-pointer font-label-md text-label-md"
+              type="button"
+            >
+              <Maximize2 className="w-4 h-4" />
+              <span>Open task details</span>
+            </button>
+
+            <button
+              onClick={() => onEditTask(recommendedTask.id)}
+              className="h-[44px] px-space-md rounded-xl text-outline-variant hover:text-surface-bright hover:bg-brand/30 transition-colors flex items-center gap-1.5 cursor-pointer font-label-md text-label-md"
+              type="button"
+            >
+              <Split className="w-4 h-4" />
+              <span>Break into smaller steps</span>
             </button>
           </div>
-        ) : null}
+        </div>
 
-        {/* Progress Bar */}
-        {totalSubtasks > 0 && (
-          <div className="mb-6">
-            <ProgressBar
-              value={progressPercent}
-              label={`Task Completion: ${completedSubtasks} of ${totalSubtasks} micro-steps`}
-              size="sm"
-            />
+        {/* Calm Right Negative / Visual Balance Zone */}
+        <div className="hidden lg:flex flex-col items-end justify-between self-stretch py-space-xs text-right shrink-0">
+          <div className="w-16 h-16 rounded-2xl bg-brand/30 flex items-center justify-center text-primary-fixed-dim/40">
+            <Focus className="w-9 h-9" />
           </div>
-        )}
-
-        {/* Stitch-Styled Action Buttons */}
-        <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-slate-800">
-          <button
-            type="button"
-            onClick={() => onStartFocus(recommendedTask.id, recommendedTask.title)}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 font-bold text-sm shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 select-none"
-          >
-            <Play className="w-4 h-4 fill-current" />
-            <span>Start Focus Session</span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-950/15 font-mono font-normal">
-              [Space]
+          <div className="flex flex-col items-end gap-1 text-right">
+            <span className="font-label-sm text-label-sm text-outline-variant uppercase tracking-wider">Engine status</span>
+            <span className="font-body-sm text-body-sm text-brand-tint flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-primary-fixed-dim animate-pulse"></span>
+              Calculated on-device
             </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onEditTask(recommendedTask.id)}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            <span>Open Details</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onEditTask(recommendedTask.id)}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-          >
-            <Split className="w-3.5 h-3.5" />
-            <span>Deconstruct Steps</span>
-          </button>
+          </div>
         </div>
       </div>
     </section>

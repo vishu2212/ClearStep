@@ -55,11 +55,14 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [priorityFilter, setPriorityFilter] = useState<TaskPriorityFilter>('all');
   const [sortOption, setSortOption] = useState<TaskSortOption>('recommended');
 
-  const persistTasks = (newTasks: Task[]) => {
-    setTasks(newTasks);
-    const store = loadFromLocalStorage().store;
-    store.tasks = newTasks;
-    saveToLocalStorage(store);
+  const persistTasks = (updater: Task[] | ((prev: Task[]) => Task[])) => {
+    setTasks((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      const store = loadFromLocalStorage().store;
+      store.tasks = next;
+      saveToLocalStorage(store);
+      return next;
+    });
   };
 
   const reloadFromStorage = () => {
@@ -160,7 +163,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isFocusPinned: !!input.isFocusPinned,
     };
 
-    persistTasks([newTask, ...tasks]);
+    persistTasks((prev) => [newTask, ...prev]);
     return newTask;
   };
 

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar, NavTab } from './components/layout/Navbar';
+import { Sidebar, NavTab } from './components/layout/Sidebar';
+import { Header } from './components/layout/Header';
+import { ContextualSidePanel } from './components/layout/ContextualSidePanel';
 import { CorruptionAlert } from './components/layout/CorruptionAlert';
 import { NextActionHero } from './components/nextAction/NextActionHero';
+import { TodayTaskRow } from './components/tasks/TodayTaskRow';
 import { TaskFilterBar } from './components/tasks/TaskFilterBar';
 import { TaskCard } from './components/tasks/TaskCard';
 import { TaskModal } from './components/tasks/TaskModal';
@@ -11,17 +14,29 @@ import { SettingsView } from './components/settings/SettingsView';
 import { useTasks } from './context/TaskContext';
 import { useTimer } from './context/TimerContext';
 import { getLocalDateString } from './domain/recommendationEngine';
-import { Plus, CheckCircle, ArrowRight } from 'lucide-react';
+import { Plus, PlusCircle, Timer, CheckCircle2, Clock } from 'lucide-react';
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<NavTab>('today');
+  const [activeTab, setActiveTab] = useState<NavTab>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      if (tabParam === 'focus' || tabParam === 'tasks' || tabParam === 'progress' || tabParam === 'settings') {
+        return tabParam;
+      }
+      if (window.location.hash === '#focus') return 'focus';
+    }
+    return 'today';
+  });
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [quickAddTitle, setQuickAddTitle] = useState('');
 
-  const { tasks, filteredTasks } = useTasks();
+  const { tasks, filteredTasks, createTask, toggleTaskCompletion } = useTasks();
   const { startTimer } = useTimer();
 
-  // Global Keyboard Shortcuts (n for new task, f for focus, Esc)
+  // Global Keyboard Shortcuts (n for new task, f for focus, Space for focus start, Esc)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const activeTag = (document.activeElement?.tagName || '').toLowerCase();
@@ -64,81 +79,245 @@ export const App: React.FC = () => {
     setIsTaskModalOpen(true);
   };
 
-  // Compute Today's priority tasks (tasks due today or urgent/high priority)
+  // Quick Add handler
+  const handleQuickAdd = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && quickAddTitle.trim()) {
+      e.preventDefault();
+      createTask({
+        title: quickAddTitle.trim(),
+        priority: 'medium',
+        dueDate: getLocalDateString(),
+        tags: ['Coursework'],
+        subtasks: [],
+        isFocusPinned: false,
+      });
+      setQuickAddTitle('');
+    }
+  };
+
+  // Compute Today's priority tasks
   const todayStr = getLocalDateString();
   const todayTasks = tasks.filter(
-    (t) => !t.completed && (t.dueDate === todayStr || t.priority === 'urgent' || t.isFocusPinned)
+    (t) => t.dueDate === todayStr || t.priority === 'urgent' || t.isFocusPinned || !t.completed
   );
 
+  const pendingTodayCount = todayTasks.filter((t) => !t.completed).length;
+  const doneTodayCount = tasks.filter((t) => t.completed).length;
+
+  // Format date for page title
+  const todayDate = new Date();
+  const formattedDate = todayDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  });
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-bg-page font-body-md text-text-primary antialiased selection:bg-brand-tint selection:text-brand-strong flex flex-col">
       {/* Safe Storage Recovery Banner */}
       <CorruptionAlert />
 
-      {/* Main Navbar */}
-      <Navbar
+      {/* Stitch Approved Fixed Left Sidebar (248px) */}
+      <Sidebar
         activeTab={activeTab}
         onSelectTab={setActiveTab}
-        onOpenNewTask={handleOpenNewTask}
+        isOpenMobile={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
 
-      {/* Main View Container */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {/* TAB 1: TODAY (HOME) */}
-        {activeTab === 'today' && (
-          <div className="space-y-8 animate-fade-in">
-            {/* Top Welcome & Rationale */}
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                One clear next step for today.
-              </h1>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 max-w-xl">
-                Don't look at the entire mountain of work at once. Focus on the single action below to build real momentum.
-              </p>
-            </div>
+      {/* Workspace Wrapper (offset by left sidebar 248px on desktop) */}
+      <div className="pl-0 lg:pl-[248px] flex flex-col flex-1">
+        {/* Stitch Approved Fixed Top Header (56px) */}
+        <Header
+          onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
+          onOpenNewTask={handleOpenNewTask}
+          onSelectTab={setActiveTab}
+        />
 
-            {/* Next Best Action Hero Card */}
-            <NextActionHero
-              onStartFocus={handleStartFocus}
-              onEditTask={handleEditTask}
-              onCreateTask={handleOpenNewTask}
-            />
+        {/* Main Content Area (offset by top header 56px) */}
+        <main className="relative pt-14 min-h-screen bg-bg-page w-full px-space-md sm:px-space-lg">
+          {/* TAB 1: TODAY (APPROVED STITCH 2-COLUMN DASHBOARD) */}
+          {activeTab === 'today' && (
+            <div className="flex flex-col w-full animate-fade-in pt-space-xs">
+              {/* Main Grid: Primary Focus Area + Right 320px Contextual Panel */}
+              <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-space-xl items-start pb-space-2xl max-w-[1240px]">
+                {/* LEFT / MAIN WORKSPACE COLUMN (~880px max feel) */}
+                <div className="flex flex-col gap-space-lg min-w-0">
+                  {/* Screen Heading & Page Header */}
+                  <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-space-md pt-space-xs">
+                    <div className="flex flex-col">
+                      <h1 className="font-headline-lg text-headline-lg text-text-primary tracking-tight font-semibold">
+                        Today
+                      </h1>
+                      <p className="font-body-md text-body-md text-text-secondary mt-1 flex items-center gap-2">
+                        <span>Good morning. Let's make today manageable.</span>
+                        <span className="sr-only">One clear next step for today.</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-border-strong inline-block"></span>
+                        <span className="text-text-tertiary">{formattedDate}</span>
+                      </p>
+                    </div>
 
-            {/* Today's Priority Queue */}
-            <section aria-labelledby="today-queue-heading">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <h2 id="today-queue-heading" className="text-lg font-bold text-slate-900 dark:text-white">
-                    Today's Priority Focus
-                  </h2>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono font-medium">
-                    {todayTasks.length}
-                  </span>
+                    <div className="flex items-center gap-space-sm self-start sm:self-auto">
+                      <button
+                        onClick={handleOpenNewTask}
+                        aria-label="Create new task"
+                        className="inline-flex items-center gap-space-xs h-[44px] px-space-md rounded-xl bg-bg-surface text-text-primary border border-border-subtle/40 shadow-sm hover:bg-bg-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand transition-all cursor-pointer select-none font-label-md text-label-md font-semibold"
+                        type="button"
+                      >
+                        <Plus className="w-4 h-4 text-brand" />
+                        <span>Add task</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 8A: SIGNATURE HERO — NEXT BEST ACTION */}
+                  <NextActionHero
+                    onStartFocus={handleStartFocus}
+                    onEditTask={handleEditTask}
+                    onCreateTask={handleOpenNewTask}
+                  />
+
+                  {/* Quick-Add Inline Input Field */}
+                  <div className="w-full">
+                    <label className="sr-only" htmlFor="quick-add-task-input">
+                      Quick add a task for today
+                    </label>
+                    <div className="relative flex items-center rounded-xl bg-bg-surface shadow-sm transition-all focus-within:ring-2 focus-within:ring-brand border border-border-subtle/30">
+                      <PlusCircle className="w-5 h-5 text-text-tertiary ml-space-md shrink-0" />
+                      <input
+                        className="w-full h-[48px] bg-transparent pl-space-sm pr-16 font-body-md text-body-md text-text-primary placeholder:text-text-tertiary focus:outline-none"
+                        id="quick-add-task-input"
+                        value={quickAddTitle}
+                        onChange={(e) => setQuickAddTitle(e.target.value)}
+                        onKeyDown={handleQuickAdd}
+                        placeholder="Add a task for today... (Press Enter to save)"
+                        type="text"
+                      />
+                      <div className="absolute right-space-md flex items-center gap-1 pointer-events-none">
+                        <span className="font-mono text-xs text-text-tertiary bg-bg-sunken px-1.5 py-0.5 rounded">
+                          ↵ Enter
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Today's Tasks Section (Strictly Rows over Cards) */}
+                  <section aria-labelledby="today-tasks-title" className="flex flex-col mt-space-sm">
+                    <div className="flex items-center justify-between mb-space-sm">
+                      <div className="flex items-center gap-space-sm">
+                        <h2
+                          className="font-headline-sm text-headline-sm text-text-primary font-semibold"
+                          id="today-tasks-title"
+                        >
+                          Today's Tasks
+                        </h2>
+                        <span className="px-2 py-0.5 rounded-full bg-bg-sunken text-text-secondary font-label-sm text-label-sm font-semibold">
+                          {pendingTodayCount} remaining
+                        </span>
+                      </div>
+                      <span className="font-label-sm text-label-sm text-text-tertiary">
+                        Grouped by deadline urgency
+                      </span>
+                    </div>
+
+                    {/* Task Rows Container */}
+                    <div
+                      className="flex flex-col rounded-xl bg-bg-surface shadow-sm overflow-hidden border border-border-subtle/30 divide-y divide-bg-sunken"
+                      id="task-rows-container"
+                    >
+                      {todayTasks.length === 0 ? (
+                        <div className="p-8 text-center text-text-secondary">
+                          <p className="font-semibold text-text-primary mb-1">
+                            No active tasks scheduled for today.
+                          </p>
+                          <p className="text-xs text-text-tertiary">
+                            Use the quick-add input above or add a task to plan ahead.
+                          </p>
+                        </div>
+                      ) : (
+                        todayTasks.map((task) => (
+                          <TodayTaskRow
+                            key={task.id}
+                            task={task}
+                            onToggleComplete={toggleTaskCompletion}
+                            onStartFocus={handleStartFocus}
+                            onEditTask={handleEditTask}
+                          />
+                        ))
+                      )}
+                    </div>
+                  </section>
+
+                  {/* 8A: DAILY OVERVIEW STRIP (Quiet, honest 3-item row) */}
+                  <footer
+                    aria-label="Daily honest metrics"
+                    className="flex flex-wrap items-center justify-between gap-space-md px-space-md py-space-sm rounded-xl bg-bg-surface/80 text-text-secondary font-body-sm text-body-sm shadow-sm mt-space-xs border border-border-subtle/30"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Timer className="w-4 h-4 text-brand shrink-0" />
+                      <span>
+                        Focused today: <strong className="text-text-primary font-semibold">45 min</strong>
+                      </span>
+                    </div>
+                    <div className="hidden sm:block w-1 h-1 rounded-full bg-border-strong"></div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
+                      <span>
+                        Tasks done today: <strong className="text-text-primary font-semibold">{doneTodayCount}</strong>
+                      </span>
+                    </div>
+                    <div className="hidden sm:block w-1 h-1 rounded-full bg-border-strong"></div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-text-tertiary shrink-0" />
+                      <span>
+                        Left to do: <strong className="text-text-primary font-semibold">{pendingTodayCount}</strong>
+                      </span>
+                    </div>
+                  </footer>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('tasks')}
-                  className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-                >
-                  <span>View All Tasks ({tasks.length})</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                {/* RIGHT CONTEXTUAL PANEL: 'Coming Up' (Next 7 Days, Exactly 320px Wide) */}
+                <ContextualSidePanel />
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: TASKS (BACKLOG & SEARCH) */}
+          {activeTab === 'tasks' && (
+            <div className="space-y-6 animate-fade-in py-space-lg max-w-5xl">
+              <div>
+                <h1 className="font-headline-lg text-headline-lg text-text-primary tracking-tight font-semibold">
+                  All Tasks & Backlog
+                </h1>
+                <p className="font-body-md text-body-md text-text-secondary mt-1">
+                  Filter, search, organize, and deconstruct your assignments into discrete steps.
+                </p>
               </div>
 
-              {todayTasks.length === 0 ? (
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 text-center text-xs text-slate-500 dark:text-slate-400">
-                  <CheckCircle className="w-8 h-8 text-emerald-500 mx-auto mb-2 opacity-80" />
-                  <p className="font-semibold text-slate-700 dark:text-slate-300">
-                    No urgent tasks scheduled specifically for today.
+              {/* Filter and Search Bar */}
+              <TaskFilterBar onOpenNewTask={handleOpenNewTask} />
+
+              {/* Tasks List */}
+              {filteredTasks.length === 0 ? (
+                <div className="bg-bg-surface border border-border-subtle/40 rounded-2xl p-10 text-center">
+                  <p className="text-sm font-semibold text-text-primary mb-1">
+                    No matching tasks found.
                   </p>
-                  <p className="mt-1">
-                    You can pick an upcoming task from your backlog or take a break.
+                  <p className="text-xs text-text-tertiary mb-4">
+                    Try adjusting your search query, clearing filters, or create a new task.
                   </p>
+                  <button
+                    type="button"
+                    onClick={handleOpenNewTask}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-brand text-brand-on shadow-sm hover:bg-brand-strong cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Create Task (n)</span>
+                  </button>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {todayTasks.map((task) => (
+                  {filteredTasks.map((task) => (
                     <TaskCard
                       key={task.id}
                       task={task}
@@ -148,81 +327,33 @@ export const App: React.FC = () => {
                   ))}
                 </div>
               )}
-            </section>
-          </div>
-        )}
-
-        {/* TAB 2: TASKS (BACKLOG & SEARCH) */}
-        {activeTab === 'tasks' && (
-          <div className="space-y-6 animate-fade-in">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-                All Tasks & Backlog
-              </h1>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-                Filter, search, organize, and deconstruct your assignments into discrete steps.
-              </p>
             </div>
+          )}
 
-            {/* Filter and Search Bar */}
-            <TaskFilterBar onOpenNewTask={handleOpenNewTask} />
+          {/* TAB 3: FOCUS MODE */}
+          {activeTab === 'focus' && (
+            <div className="animate-fade-in py-space-md">
+              <FocusModeView onExit={() => setActiveTab('today')} />
+            </div>
+          )}
 
-            {/* Tasks List */}
-            {filteredTasks.length === 0 ? (
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-10 text-center">
-                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  No matching tasks found.
-                </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
-                  Try adjusting your search query, clearing filters, or create a new task.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleOpenNewTask}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white shadow-sm hover:bg-blue-700"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Create Task (n)</span>
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {filteredTasks.map((task) => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    onEdit={handleEditTask}
-                    onStartFocus={handleStartFocus}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+          {/* TAB 4: PROGRESS */}
+          {activeTab === 'progress' && (
+            <div className="animate-fade-in py-space-lg max-w-5xl">
+              <ProgressView />
+            </div>
+          )}
 
-        {/* TAB 3: FOCUS MODE */}
-        {activeTab === 'focus' && (
-          <div className="animate-fade-in">
-            <FocusModeView onExit={() => setActiveTab('today')} />
-          </div>
-        )}
+          {/* TAB 5: SETTINGS */}
+          {activeTab === 'settings' && (
+            <div className="animate-fade-in py-space-lg max-w-5xl">
+              <SettingsView />
+            </div>
+          )}
+        </main>
+      </div>
 
-        {/* TAB 4: PROGRESS */}
-        {activeTab === 'progress' && (
-          <div className="animate-fade-in">
-            <ProgressView />
-          </div>
-        )}
-
-        {/* TAB 5: SETTINGS */}
-        {activeTab === 'settings' && (
-          <div className="animate-fade-in">
-            <SettingsView />
-          </div>
-        )}
-      </main>
-
-      {/* Task Creation / Edit Modal */}
+      {/* Accessible Task Creation / Edit Modal */}
       <TaskModal
         isOpen={isTaskModalOpen}
         onClose={() => {
@@ -231,19 +362,6 @@ export const App: React.FC = () => {
         }}
         taskIdToEdit={editingTaskId}
       />
-
-      {/* Accessible Footer */}
-      <footer className="border-t border-slate-200 dark:border-slate-800 py-6 px-4 bg-white/50 dark:bg-slate-950/50 mt-auto">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
-          <p>
-            <strong>ClearStep</strong> — Engineered for cognitive clarity & accessibility. Built for the Taskforge Hackathon.
-          </p>
-          <div className="flex items-center gap-4">
-            <span>Local-first • 100% Offline</span>
-            <span>WCAG 2.2 AA</span>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

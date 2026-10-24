@@ -19,6 +19,8 @@ interface TimerContextType {
   resumeTimer: () => void;
   resetTimer: () => void;
   switchMode: (newMode: FocusMode) => void;
+  addSeconds: (seconds: number) => void;
+  completeSessionNow: () => void;
   dismissCompleteModal: () => void;
   clearSessionHistory: () => void;
 }
@@ -159,6 +161,47 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setIsSessionComplete(false);
   };
 
+  const addSeconds = (secs: number) => {
+    setTargetSeconds((prev) => prev + secs);
+    setRemainingSeconds((prev) => {
+      const next = prev + secs;
+      if (isRunning) {
+        pausedRemainingRef.current = next;
+        startTimeRef.current = Date.now();
+      } else {
+        pausedRemainingRef.current = next;
+      }
+      return next;
+    });
+  };
+
+  const completeSessionNow = () => {
+    setIsRunning(false);
+    setRemainingSeconds(0);
+    startTimeRef.current = null;
+    setIsSessionComplete(true);
+
+    if (mode === 'focus') {
+      const elapsedMins = Math.max(1, Math.round((targetSeconds - remainingSeconds) / 60));
+      const newSession: FocusSession = {
+        id: `session-${Date.now()}`,
+        taskId: activeTaskId,
+        taskTitle: activeTaskTitle || 'Independent Focus Session',
+        mode: 'focus',
+        durationMinutes: elapsedMins,
+        completedAt: new Date().toISOString(),
+      };
+
+      setSessions((prev) => {
+        const next = [newSession, ...prev];
+        const store = loadFromLocalStorage().store;
+        store.sessions = next;
+        saveToLocalStorage(store);
+        return next;
+      });
+    }
+  };
+
   const dismissCompleteModal = () => {
     setIsSessionComplete(false);
     // Transition to appropriate next mode (e.g. break after focus)
@@ -195,6 +238,8 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         resumeTimer,
         resetTimer,
         switchMode,
+        addSeconds,
+        completeSessionNow,
         dismissCompleteModal,
         clearSessionHistory,
       }}
