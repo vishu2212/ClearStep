@@ -1,0 +1,45 @@
+{
+  "mode": "interactive",
+  "granularity": "standard",
+  "workflow": {
+    "research": false,
+    "plan_check": true,
+    "verifier": true,
+    "auto_advance": true,
+    "nyquist_validation": true,
+    "security_enforcement": true,
+    "security_asvs_level": 1,
+    "security_block_on": "high",
+    "discuss_mode": "discuss",
+    "research_before_questions": false,
+    "code_review_command": "npx --yes coderabbit review --agent",
+    "plan_bounce": false,
+    "cross_ai_execution": false,
+    "test_gate_timeout": 600
+  },
+  "ship": {
+    "pr_body_sections": []
+  },
+  "planning": {
+    "commit_docs": true,
+    "search_gitignored": false,
+    "sub_repos": []
+  },
+  "git": {
+    "create_tag": true
+  },
+  "parallelization": {
+    "enabled": false
+  },
+  "gates": {
+    "execute_next_plan": false,
+    "confirm_transition": false,
+    "confirm_milestone_scope": false
+  },
+  "hooks": {
+    "context_warnings": false
+  },
+  "project_code": "CLEARSTEP",
+  "agent_skills": {},
+  "claude_md_path": "./GEMINI.md"
+}

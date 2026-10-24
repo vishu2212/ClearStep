@@ -1,0 +1,22 @@
+# Node modules & build artifacts
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Editor & OS files
+.DS_Store
+Thumbs.db
+*.log
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Temporary / testing
+coverage/
+.vitest/
