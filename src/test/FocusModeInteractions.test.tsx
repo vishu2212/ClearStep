@@ -39,7 +39,7 @@ describe('Focus Mode Full Interaction & Verification Suite', () => {
     expect(screen.getByRole('button', { name: /Complete session early/i })).toBeInTheDocument();
 
     // Ambient audio deck
-    expect(screen.getByText(/Binaural Brown Noise/i)).toBeInTheDocument();
+    expect(screen.getByText(/Ambient Sound Muted/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Brown Noise/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Rain on Library/i })).toBeInTheDocument();
 

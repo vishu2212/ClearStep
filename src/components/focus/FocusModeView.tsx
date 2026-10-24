@@ -141,7 +141,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
 
   // Ambient sound generator state (Web Audio API - 100% offline)
   type AmbientSound = 'mute' | 'brown' | 'rain' | 'lofi';
-  const [ambientSound, setAmbientSound] = useState<AmbientSound>('brown');
+  const [ambientSound, setAmbientSound] = useState<AmbientSound>('mute');
   const [ambientVolume, setAmbientVolume] = useState<number>(0.65);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
