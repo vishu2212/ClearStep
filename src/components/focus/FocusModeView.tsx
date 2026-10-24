@@ -228,6 +228,16 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
     }
   }, [ambientVolume]);
 
+  // Lock body scroll when modals open in Focus Mode
+  useEffect(() => {
+    if (showExitConfirm || isSessionComplete) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = 'unset';
+      };
+    }
+  }, [showExitConfirm, isSessionComplete]);
+
   // Spacebar and Esc Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -894,6 +904,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
           id="exit-modal"
           role="dialog"
           aria-modal="true"
+          aria-labelledby="exit-modal-title"
         >
           <div
             className="bg-white bg-bg-surface modal-surface rounded-2xl max-w-md w-full p-6 shadow-[0_20px_50px_rgba(0,0,0,0.25)] flex flex-col gap-4 border border-border-subtle animate-fade-in text-text-primary"
@@ -904,7 +915,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                 <Coffee className="w-5 h-5" />
               </div>
               <div className="flex flex-col">
-                <h3 className="font-headline-sm text-headline-sm text-on-surface font-semibold">
+                <h3 id="exit-modal-title" className="font-headline-sm text-headline-sm text-on-surface font-semibold">
                   Pause or End Focus Session?
                 </h3>
                 <span className="font-label-sm text-label-sm text-on-surface-variant">
@@ -946,6 +957,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
           id="complete-modal"
           role="dialog"
           aria-modal="true"
+          aria-labelledby="complete-modal-title"
         >
           <div
             className="bg-white bg-bg-surface modal-surface rounded-2xl max-w-lg w-full p-6 shadow-[0_20px_50px_rgba(0,0,0,0.25)] flex flex-col gap-5 border border-border-subtle animate-fade-in text-text-primary"
@@ -960,7 +972,7 @@ export const FocusModeView: React.FC<FocusModeViewProps> = ({ onExit }) => {
                   <span className="font-label-sm text-label-sm text-secondary uppercase font-semibold">
                     Session Accomplished
                   </span>
-                  <h3 className="font-headline-sm text-headline-sm text-on-surface font-semibold">
+                  <h3 id="complete-modal-title" className="font-headline-sm text-headline-sm text-on-surface font-semibold">
                     Brilliant Flow
                   </h3>
                 </div>

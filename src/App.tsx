@@ -159,6 +159,7 @@ export const App: React.FC = () => {
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
           onOpenNewTask={handleOpenNewTask}
           onSelectTab={setActiveTab}
+          isMobileMenuOpen={isMobileMenuOpen}
         />
 
         {/* Main Content Area (offset by top header 56px) */}

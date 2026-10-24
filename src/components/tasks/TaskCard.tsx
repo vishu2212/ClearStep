@@ -16,6 +16,7 @@ import { Task } from '../../domain/types';
 import { useTasks } from '../../context/TaskContext';
 import { PriorityBadge } from '../common/Badge';
 import { ProgressBar } from '../common/ProgressBar';
+import { ConfirmModal } from '../common/ConfirmModal';
 import { getLocalDateString, getDaysDifference } from '../../domain/recommendationEngine';
 
 interface TaskCardProps {
@@ -36,6 +37,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onStartFocus }
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const completedSubtasks = task.subtasks.filter((s) => s.completed).length;
   const totalSubtasks = task.subtasks.length;
@@ -276,11 +278,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onStartFocus }
 
               <button
                 type="button"
-                onClick={() => {
-                  if (confirm(`Are you sure you want to delete "${task.title}"?`)) {
-                    deleteTask(task.id);
-                  }
-                }}
+                onClick={() => setIsDeleteModalOpen(true)}
                 aria-label={`Delete task "${task.title}"`}
                 className="p-1.5 rounded-lg text-text-tertiary hover:text-danger hover:bg-danger-bg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand cursor-pointer"
               >
@@ -290,6 +288,16 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onStartFocus }
           </div>
         </div>
       </div>
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => deleteTask(task.id)}
+        title="Delete Task"
+        message={`Are you sure you want to delete "${task.title}"? This action cannot be undone.`}
+        confirmLabel="Delete Task"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </article>
   );
 };

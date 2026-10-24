@@ -11,12 +11,14 @@ interface HeaderProps {
   onOpenMobileMenu: () => void;
   onOpenNewTask: () => void;
   onSelectTab: (tab: 'today' | 'tasks' | 'focus' | 'progress' | 'settings') => void;
+  isMobileMenuOpen?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenMobileMenu,
   onOpenNewTask: _onOpenNewTask,
   onSelectTab,
+  isMobileMenuOpen = false,
 }) => {
   // Format current date nicely: "Thursday, 24 October"
   const today = new Date();
@@ -33,8 +35,11 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex items-center gap-2 sm:gap-4">
         <button
           onClick={onOpenMobileMenu}
-          className="lg:hidden p-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-container transition-colors cursor-pointer"
+          id="mobile-menu-toggle-btn"
+          className="lg:hidden p-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-container transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           aria-label="Open navigation menu"
+          aria-expanded={isMobileMenuOpen}
+          aria-controls="mobile-navigation-drawer"
         >
           <Menu className="w-5 h-5" />
         </button>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Sun,
   CheckSquare,
@@ -25,6 +25,92 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpenMobile = false,
   onCloseMobile,
 }) => {
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth < 1024;
+  });
+
+  const sidebarRef = useRef<HTMLElement>(null);
+  const previousActiveElementRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mediaQuery = window.matchMedia('(max-width: 1023px)');
+    const updateMatch = (e: MediaQueryListEvent | MediaQueryList) => {
+      setIsMobile(e.matches);
+    };
+    updateMatch(mediaQuery);
+    const listener = (e: MediaQueryListEvent) => updateMatch(e);
+    mediaQuery.addEventListener('change', listener);
+    return () => mediaQuery.removeEventListener('change', listener);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobile) return;
+
+    if (isOpenMobile) {
+      previousActiveElementRef.current = document.activeElement as HTMLElement | null;
+
+      // Focus close button or first interactive element inside drawer
+      const timer = setTimeout(() => {
+        if (sidebarRef.current) {
+          const closeBtn = sidebarRef.current.querySelector<HTMLElement>('button[aria-label="Close sidebar"]');
+          if (closeBtn) {
+            closeBtn.focus();
+          } else {
+            const focusable = sidebarRef.current.querySelectorAll<HTMLElement>(
+              'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            if (focusable.length > 0) {
+              focusable[0].focus();
+            }
+          }
+        }
+      }, 50);
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          onCloseMobile?.();
+        }
+
+        // Focus trap inside drawer
+        if (e.key === 'Tab' && sidebarRef.current) {
+          const focusable = sidebarRef.current.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          );
+          if (focusable.length === 0) return;
+
+          const firstElement = focusable[0];
+          const lastElement = focusable[focusable.length - 1];
+
+          if (e.shiftKey) {
+            if (document.activeElement === firstElement) {
+              lastElement.focus();
+              e.preventDefault();
+            }
+          } else {
+            if (document.activeElement === lastElement) {
+              firstElement.focus();
+              e.preventDefault();
+            }
+          }
+        }
+      };
+
+      document.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+
+      return () => {
+        clearTimeout(timer);
+        document.removeEventListener('keydown', handleKeyDown);
+        document.body.style.overflow = 'unset';
+        if (previousActiveElementRef.current) {
+          previousActiveElementRef.current.focus();
+        }
+      };
+    }
+  }, [isMobile, isOpenMobile, onCloseMobile]);
+
   const navItems: { id: NavTab; label: string; icon: (active: boolean) => React.ReactNode }[] = [
     {
       id: 'today',
@@ -76,6 +162,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Main Left Fixed Sidebar (248px) */}
       <aside
+        ref={sidebarRef}
+        id="mobile-navigation-drawer"
+        role={isMobile && isOpenMobile ? 'dialog' : undefined}
+        aria-modal={isMobile && isOpenMobile ? 'true' : undefined}
+        aria-label={isMobile ? 'Navigation drawer' : undefined}
+        aria-hidden={isMobile && !isOpenMobile ? 'true' : undefined}
+        inert={isMobile && !isOpenMobile ? true : undefined}
         className={`fixed left-0 top-0 h-full w-[248px] bg-accent-on z-50 flex flex-col justify-between py-4 select-none transition-transform duration-200 ease-in-out border-r border-brand-strong/40 ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
@@ -102,7 +195,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Close button on mobile */}
             <button
               onClick={onCloseMobile}
-              className="lg:hidden text-slate-300 hover:text-white p-1 rounded-lg cursor-pointer"
+              className="lg:hidden text-slate-300 hover:text-white p-1 rounded-lg cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               aria-label="Close sidebar"
             >
               <X className="w-5 h-5" />
@@ -124,7 +217,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     onCloseMobile?.();
                   }}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`group relative flex items-center h-[44px] px-4 rounded-[10px] transition-colors w-full text-left font-body-md text-body-md cursor-pointer ${
+                  className={`group relative flex items-center h-[44px] px-4 rounded-[10px] transition-colors w-full text-left font-body-md text-body-md cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                     isActive
                       ? 'bg-brand/50 text-white font-semibold'
                       : 'text-slate-300/80 hover:text-white hover:bg-brand/20 font-medium'
@@ -149,7 +242,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onSelectTab('settings');
               onCloseMobile?.();
             }}
-            className="flex items-center gap-2.5 p-2 rounded-xl text-slate-300/80 hover:text-white hover:bg-brand/20 transition-colors group w-full text-left cursor-pointer"
+            className="flex items-center gap-2.5 p-2 rounded-xl text-slate-300/80 hover:text-white hover:bg-brand/20 transition-colors group w-full text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             title="Data is saved in local browser storage"
           >
             <Database className="w-4 h-4 text-slate-300/70 group-hover:text-white shrink-0" />

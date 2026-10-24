@@ -22,3 +22,8 @@ Thumbs.db
 # Temporary / testing
 coverage/
 .vitest/
+
+# Playwright test artifacts & reports
+test-results/
+playwright-report/
+e2e-results.json
