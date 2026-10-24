@@ -1,155 +1,213 @@
-# ClearStep — Less Overwhelm. One Clear Next Step.
+# ClearStep — Less overwhelm. One clear next step.
 
 > **Taskforge Hackathon Submission**  
-> An accessible, local-first web application designed to conquer task paralysis and cognitive overwhelm for students.
+> An accessible, local-first web application engineered to conquer task paralysis and cognitive overwhelm for students.
+>
+> **Live Demo:** [https://github.com/vishu2212/ClearStep](https://github.com/vishu2212/ClearStep) *(Deployment target)*<br />
+> **Repository:** [https://github.com/vishu2212/ClearStep.git](https://github.com/vishu2212/ClearStep.git)
 
 ---
 
-## 1. Project Overview
+## Visual Preview
 
-Students and overwhelmed individuals face a recurring barrier: **executive dysfunction and backlog paralysis**. Traditional to-do managers function as bottomless accumulation pits, displaying dozens of competing assignments simultaneously. This flood of pending work forces the user to expend mental willpower just deciding what to work on, or triggers complete avoidance.
+| Today Dashboard | Focus Mode View |
+| :---: | :---: |
+| ![Today Dashboard](./public/verified_today_1440.png) | ![Focus Mode](./public/verified_focus_1440.png) |
 
-**ClearStep reverses this dynamic:**
-1. **Deconstructs Mountains:** Breaks large, frightening assignments into 10–15 minute micro-steps using 1-click breakdown templates (Essays, Exams, Projects, Admin).
-2. **Recommends One Next Action:** Uses a transparent, deterministic prioritization engine that highlights the single best task to start right now—and explains *why* in plain language.
-3. **Calm Focus Space:** Hides the rest of the backlog behind a distraction-reduced Focus Mode with an inactivity-resilient timer that never drifts when browser tabs sleep.
-4. **Zero Guilt & Real Progress:** Tracks real completed effort without artificial streaks, manipulative gamification, or shaming mechanics.
-
----
-
-## 2. Core Features
-
-- **Next Best Action Hero:** A prominent recommendation card with a transparent rationale (e.g., *"Why now: Overdue by 1 day & high priority • Momentum: 2/4 subtasks done"*).
-- **Subtask Checklist & Quick Templates:** 1-click templates for Research Papers, Exam Prep, Software Milestones, and Administrative Applications.
-- **Inactivity-Resilient Focus Timer:** Computes remaining time from wall-clock timestamp differences (`Date.now() - startTime`), preventing drift when tabs are backgrounded or minimized.
-- **Local-First & 100% Offline:** Runs entirely client-side in the browser. Zero account registration required, zero network latency, zero data exfiltration.
-- **Fault-Tolerant Persistence:** Validates all storage via strict Zod schemas (`clearstep_v1_store`). If corrupted data is ever encountered, it archives the snapshot to `clearstep_backup_<timestamp>` and reinitializes defaults without crashing.
-- **Accessibility by Design (WCAG 2.2 AA):** High-contrast color palette, visible double-ring focus states, screen reader landmarks, polite live regions (`aria-live="polite"`), and explicit reduced-motion support.
-- **Global Keyboard Shortcuts:**
-  - `/` — Focus search bar
-  - `n` — Create new task
-  - `f` — Enter focus mode
-  - `Space` — Start / Pause focus timer
-  - `Esc` — Close modal or return to overview
+| Task Workspace & Breakdown | Weekly Progress & Stats |
+| :---: | :---: |
+| ![Tasks View](./public/verified_tasks_1440.png) | ![Progress View](./public/verified_progress_1440.png) |
 
 ---
 
-## 3. Technology Stack
+## 1. Problem & Core Workflow
 
-- **Framework:** React 19, TypeScript (Strict Mode enabled, `noImplicitAny: true`)
-- **Build Tool:** Vite
-- **Styling:** Tailwind CSS (custom semantic tokens, responsive layouts, CSS variables)
-- **Icons:** Lucide React
-- **Validation:** Zod
-- **Testing:** Vitest, React Testing Library, jsdom
-- **Code Review:** CodeRabbit CLI (`npx --yes coderabbit review --agent`)
+Students and neurodivergent individuals face a recurring, paralyzing barrier: **executive dysfunction and backlog overload**. Standard task managers function as bottomless accumulation pits, displaying dozens of competing assignments simultaneously. This flood of pending items forces the user to expend precious mental energy just deciding what to work on, frequently triggering procrastination or complete avoidance.
+
+**ClearStep reverses this dynamic with a simple, three-step calm workflow:**
+
+```
++-------------------------------------------------------------------------+
+| 1. DECONSTRUCT                                                          |
+| Break large, intimidating assignments into 10-15 min micro-steps        |
+| using 1-click templates (Research Paper, Exam Prep, Software, Admin).   |
++-------------------------------------------------------------------------+
+                                    |
+                                    v
++-------------------------------------------------------------------------+
+| 2. RECOMMENDED NEXT BEST ACTION                                         |
+| Transparent deterministic scoring selects the SINGLE highest-impact     |
+| task to work on right now, explaining why in plain language.            |
++-------------------------------------------------------------------------+
+                                    |
+                                    v
++-------------------------------------------------------------------------+
+| 3. CALM FOCUS SESSION                                                   |
+| Backlog hides away. Run an inactivity-resilient focus timer with        |
+| ambient audio, distraction note capture, and zero guilt streaks.        |
++-------------------------------------------------------------------------+
+```
 
 ---
 
-## 4. Getting Started & Local Reproduction
+## 2. Transparent Next Best Action Engine
+
+ClearStep does **not** rely on opaque black-box machine learning or hallucinated suggestions. The Next Best Action algorithm is 100% deterministic, reproducible, and explainable.
+
+### Scoring Heuristics & Weights
+
+| Signal | Weight | Rationale |
+| :--- | :---: | :--- |
+| **Manual Focus Pin** | `+100` | **User Intent Sovereignty:** If a student intentionally chooses a task to focus on, human agency is absolute. Automated heuristics never override intentional user choice. |
+| **Overdue Task** | `+60` | Mitigates missed deadlines and immediate academic risk. |
+| **Due Today** | `+40` | Directs focus to today's scheduled commitments. |
+| **Due Soon (<= 2 days)**| `+20` | Gentle preemptive awareness before deadlines turn urgent. |
+| **Priority: Urgent** | `+30` | Explicit instructor or syllabus importance. |
+| **Priority: High** | `+20` | Significant academic assignment or milestone. |
+| **Priority: Medium** | `+10` | Standard recurring coursework. |
+| **Subtask Momentum** | `+10` | Rewards partially completed subtasks (e.g. 1/3 or 2/4 done) to leverage the psychological Zeigarnik effect. |
+| **Age Bonus** | `+0` to `+5` | Gradual bonus (+1 per week, capped at 5) to prevent stagnant backlog tasks from being forgotten. |
+
+### Strict Deterministic Tie-Breaking
+When two tasks achieve an identical composite score:
+1. **Age Preference:** The older task (`createdAt` earlier in time) is selected first to prevent starvation.
+2. **Deterministic Fallback:** If `createdAt` timestamps are identical, tie-breaking falls back to alphabetical order of task IDs (`task.id.localeCompare(other.id) < 0`).
+3. **Reproducibility:** When evaluated with a fixed reference date (`todayStr`), the recommendation is pure and identical across all calls regardless of input array ordering.
+
+---
+
+## 3. Core Features
+
+- **Next Best Action Hero Card:** Highlights the immediate next step with a plain-English explanation (e.g., *"Why now: Due today • Urgent priority • Momentum: 2/3 subtasks done"*).
+- **Subtask Decomposition & Quick Templates:** 1-click step breakdowns for:
+  - **Literature / Research Paper:** Find 3 papers -> Outline sections -> Draft thesis statement -> Write methodology -> Polish citations.
+  - **Exam Preparation:** Review syllabus checklist -> Create formula sheet -> Complete practice problems -> Teach concept to peer.
+  - **Project Milestone:** Define acceptance criteria -> Scaffold component architecture -> Implement unit tests -> Verify in browser.
+  - **Administrative Task:** Gather required documentation -> Fill initial fields -> Proofread submission -> Submit & file receipt.
+- **Inactivity-Resilient Focus Timer:** Wall-clock delta calculations (`calculateRemainingSeconds(startTime, pausedRemaining, Date.now())`) guarantee that timer countdowns never drift or pause when browser tabs sleep or get throttled in the background.
+- **Distraction Vault / Scratchpad:** Quick in-session scratchpad to capture intrusive thoughts without derailing deep focus, with a 1-click "Transfer to Inbox" action.
+- **Ambient Audio Synthesizer:** Pure Web Audio API synthesized soundscapes (Binaural Brown Noise, White Noise, Pink Noise, Rain Simulation) with zero external audio assets.
+- **7-Day Progress Log:** Effort tracking focused on cognitive blocks completed and micro-steps finished—with zero guilt mechanics, broken streak punishments, or manipulative badges.
+
+---
+
+## 4. Privacy, Data Storage & Offline Architecture
+
+- **Local-First & Zero Backend:** ClearStep operates 100% in the client browser. No user accounts, no passwords, no telemetry tracking, and zero remote database connections.
+- **Browser-Scoped Unencrypted Storage:** All tasks, subtasks, timer sessions, and preferences are stored in the browser's `localStorage` (`clearstep_v1_store`).
+  > **Note on Security:** Data stored in `localStorage` is unencrypted and accessible to anyone with physical access or administrative privileges to the local operating system user profile.
+- **Clearing Local Data:**
+  - In-app: Go to **Settings** -> **Danger Zone** -> **"Reset All Data"**.
+  - Browser: Open DevTools Console and execute `localStorage.clear()`, or clear site data for the host in browser settings.
+- **External Network Assets:** Typography (Inter, Manrope, Plus Jakarta Sans) is served from Google Fonts CDN for visual fidelity. If offline on initial page load, standard system sans-serif font stacks are used automatically as fallbacks.
+- **Fault-Tolerant Schema Recovery:** All storage reads are validated through strict Zod schemas. If corrupted data is encountered, ClearStep snapshots the raw data to a backup slot (`clearstep_backup_<timestamp>`) and initializes defaults without crashing the React root.
+
+---
+
+## 5. Accessibility Measures & Design Decisions
+
+ClearStep incorporates intentional accessibility features for students with ADHD, visual fatigue, or motor sensitivities:
+
+1. **Color Contrast & Readability:** Text and primary interactive surfaces meet or exceed a 4.5:1 contrast ratio against light (`#F8FAFC`) and dark (`#090D16`) surfaces.
+2. **Visible Focus Rings:** Every button, tab, input, and modal has explicit, high-visibility double-ring focus states (`focus-visible:ring-2 focus-visible:ring-brand`).
+3. **Motion Sensitivity:** Respects operating system `prefers-reduced-motion` settings and provides an in-app toggle to instantly disable CSS transitions and animations.
+4. **Semantic HTML & Screen Reader Landmarks:** Built with semantic `<header>`, `<nav>`, `<main>`, and `<section>` landmarks, modal dialog semantics with `aria-modal="true"`, and polite live regions (`aria-live="polite"`).
+5. **Keyboard Shortcuts:**
+   - `/` — Focus search input
+   - `n` — Create new task
+   - `f` — Jump to Focus Mode
+   - `Space` — Start / Pause focus timer
+   - `Esc` — Close dialogs or exit full views
+
+---
+
+## 6. Quick Setup & Development
 
 ### Prerequisites
-- Node.js v18+ (tested on Node.js v24.21.0)
-- npm 9+ (tested on npm 11.19.0)
-- Any modern web browser (Edge, Chrome, Firefox, Safari)
+- Node.js v18+ (tested on Node.js v24+)
+- npm 9+ (tested on npm 11+)
 
-### Quick Setup (PowerShell / Bash)
+### Installation & Run
 
-```powershell
-# 1. Clone repository
+```bash
+# 1. Clone the repository
 git clone https://github.com/vishu2212/ClearStep.git
 cd ClearStep
 
 # 2. Install dependencies
 npm install
 
-# 3. Start local development server
+# 3. Start development server
 npm run dev
 ```
 
-The application will be live at `http://localhost:5173`.
+Visit `http://localhost:5173` in any modern web browser.
 
 ---
 
-## 5. Verification & Testing
+## 7. Verification & Quality Gates
 
-ClearStep includes comprehensive unit, domain, and integration test suites:
+Run the automated verification suite before submitting changes:
 
-```powershell
-# Run automated Vitest test suites
+```bash
+# 1. Run unit and integration tests (Vitest)
 npm run test
 
-# Run TypeScript strict typecheck
+# 2. Strict TypeScript typecheck (zero implicit any)
 npx tsc --noEmit
 
-# Run production build
+# 3. Production build validation (Vite)
 npm run build
 ```
 
-### Verified Test Coverage
-- `src/test/recommendationEngine.test.ts`: Deterministic scoring rules, priority weighting, due-date urgency, tie-breakers, and plain-English rationale generation.
-- `src/test/timerCalculations.test.ts`: Timestamp-delta elapsed time calculation, background tab drift immunity, MM:SS formatting, and percentage math.
-- `src/test/localStorageRepo.test.ts`: Zod schema validation, default seed generation, corrupted state recovery with automatic backup archiving, and JSON export/import.
-- `src/test/App.test.tsx`: Component integration, tab switching, search filtering, focus launching, and accessible modal lifecycles.
+### Verified Test Suites
+- `src/test/recommendationEngine.test.ts`: Pure scoring weights, due-date urgency, User Intent Sovereignty, subtask momentum, deterministic tie-breakers, and invalid date safety.
+- `src/test/TimerContextAttribution.test.tsx`: Independent vs task-linked session attribution, mode switching resets, and wall-clock `addSeconds` synchronization.
+- `src/test/timerCalculations.test.ts`: Wall-clock delta math, background tab sleep immunity, MM:SS formatting, and percentage math.
+- `src/test/localStorageRepo.test.ts`: Zod schema validation, quota exceeded error handling, security policy error recovery, corrupted data backup preservation, and JSON import/export.
+- `src/test/FocusModeInteractions.test.tsx`: Timer controls, +5 min increments, Distraction Vault note transfers, and session completion modal.
+- `src/test/App.test.tsx`: Component integration, navigation tabs, search and filtering, and accessible modal lifecycles.
 
 ---
 
-## 6. Architecture & System Design
+## 8. Architecture & Repository Structure
 
 ```
 src/
-├── domain/                    # Pure TypeScript domain logic (zero React dependencies)
-│   ├── types.ts               # Zod schemas & TypeScript types
-│   ├── recommendationEngine.ts# Deterministic Next Best Action scoring
-│   ├── templates.ts           # Pre-built task deconstruction checklists
+├── domain/                    # Pure TypeScript business logic (zero React dependencies)
+│   ├── types.ts               # Zod schemas and TypeScript domain contracts
+│   ├── recommendationEngine.ts# Deterministic Next Best Action scoring algorithm
+│   ├── templates.ts           # Pre-built academic micro-step templates
 │   └── timerCalculations.ts   # Wall-clock drift-resistant timer math
 ├── storage/                   # Local-first persistence
-│   ├── localStorageRepo.ts    # Safe typed repository with schema validation
-│   └── seedData.ts            # Starter student tasks for first-time use
-├── context/                   # React Context Providers & Reducers
-│   ├── TaskContext.tsx        # Tasks, subtasks, search, filter, sort
-│   ├── TimerContext.tsx       # Focus sessions, background timer sync
+│   ├── localStorageRepo.ts    # Zod-validated storage with typed error reporting
+│   └── seedData.ts            # Default starter student tasks
+├── context/                   # React Context Providers & State
+│   ├── TaskContext.tsx        # Tasks, filtering, sorting, and persistence status
+│   ├── TimerContext.tsx       # Focus sessions, mode transitions, and attribution
 │   └── PreferencesContext.tsx # User theme, timer durations, accessibility
-├── components/                # Modular UI Components
+├── components/                # UI Components structured by feature domain
 │   ├── common/                # Button, Modal, Badge, ProgressBar
-│   ├── layout/                # Navbar, CorruptionAlert
+│   ├── layout/                # Navbar, CorruptionAlert, ContextualSidePanel
 │   ├── nextAction/            # NextActionHero card
-│   ├── tasks/                 # TaskCard, TaskFilterBar, TaskModal
+│   ├── tasks/                 # TaskCard, TodayTaskRow, TaskFilterBar, TaskModal
 │   ├── focus/                 # FocusModeView
-│   ├── progress/              # ProgressView (Stats & 7-Day Chart)
-│   └── settings/              # SettingsView (Preferences & Backup)
-├── App.tsx                    # Top-level coordinator & keyboard listener
+│   ├── progress/              # ProgressView (Stats & 7-Day History)
+│   └── settings/              # SettingsView (Preferences, Backup, Reset)
+├── App.tsx                    # Main layout coordinator & keyboard listeners
 └── main.tsx                   # React root entry point
 ```
 
-For in-depth architectural and design contracts, see:
-- [`PRD.md`](./PRD.md) — Product Requirements & User Stories
-- [`DESIGN.md`](./DESIGN.md) — Visual Design System & Component Contracts
-- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — System Boundaries & State Flow
-- [`DATABASE.md`](./DATABASE.md) — Local Storage Schemas & Recovery Protocols
-- [`API.md`](./API.md) — Internal Application Service Interfaces
-- [`AGENTS.md`](./AGENTS.md) — Agent Guidelines & Definition of Done
+### In-Depth Architectural Documentation
+- [`PRD.md`](./PRD.md) — Product Requirements & User Scenarios
+- [`DESIGN.md`](./DESIGN.md) — Visual Design System & Component Tokens
+- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — System Boundaries & State Architecture
+- [`DATABASE.md`](./DATABASE.md) — Storage Schemas & Recovery Protocols
+- [`API.md`](./API.md) — Internal Application Domain Interfaces
+- [`AGENTS.md`](./AGENTS.md) — Agent Operating Standards & Definition of Done
 
 ---
 
-## 7. Accessibility (WCAG 2.2 AA) Highlights
+## 9. License & Attribution
 
-1. **Color Contrast:** All body text meets or exceeds a 4.5:1 contrast ratio against light (`#F8FAFC`) and dark (`#090D16`) surfaces.
-2. **Focus Visibility:** Every button, input, and tab features an active double-ring focus indicator (`focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2`).
-3. **Motion Sensitivity:** Respects system `prefers-reduced-motion` settings and provides an in-app toggle to instantly disable all animations.
-4. **Screen Reader Support:** Semantic HTML landmarks (`header`, `main`, `nav`, `section`, `footer`), polite live regions (`aria-live="polite"`) for timer updates, and modal focus trapping.
-
----
-
-## 8. Limitations & Future Roadmap
-
-- **Single Device Scope:** ClearStep currently operates locally per browser origin. Future v2 releases may add end-to-end encrypted peer-to-peer WebRTC synchronization.
-- **Audio Prompts:** Sound notifications are disabled by default for sensory calm; customizable sound cues are planned for future versions.
-
----
-
-## 9. AI Assistance Disclosure & License
-
-ClearStep was engineered for the Taskforge Hackathon using the GSD Core v1.18.0 meta-prompting workflow, with automated code review and security audits conducted via CodeRabbit.
-
-Licensed under the [MIT License](./LICENSE).
+ClearStep is open-source software licensed under the [MIT License](./LICENSE).

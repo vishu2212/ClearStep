@@ -8,6 +8,7 @@ interface PreferencesContextType {
   setTheme: (theme: ThemeMode) => void;
   resetPreferences: () => void;
   recoveredFromCorrupt: boolean;
+  backupSuccess: boolean;
   clearCorruptionAlert: () => void;
 }
 
@@ -17,6 +18,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [initialData] = useState(() => loadFromLocalStorage());
   const [preferences, setPreferences] = useState<UserPreferences>(initialData.store.preferences);
   const [recoveredFromCorrupt, setRecoveredFromCorrupt] = useState(initialData.recoveredFromCorrupt);
+  const [backupSuccess, setBackupSuccess] = useState(initialData.backupSuccess);
 
   // Apply dark theme class to document element
   useEffect(() => {
@@ -78,6 +80,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const clearCorruptionAlert = () => {
     setRecoveredFromCorrupt(false);
+    setBackupSuccess(false);
   };
 
   return (
@@ -88,6 +91,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
         setTheme,
         resetPreferences,
         recoveredFromCorrupt,
+        backupSuccess,
         clearCorruptionAlert,
       }}
     >

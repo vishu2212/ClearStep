@@ -115,8 +115,8 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [isRunning, targetSeconds, mode, activeTaskId, activeTaskTitle]);
 
   const startTimer = (taskId: string | null = null, taskTitle: string | null = null) => {
-    if (taskId) setActiveTaskId(taskId);
-    if (taskTitle) setActiveTaskTitle(taskTitle);
+    setActiveTaskId(taskId || null);
+    setActiveTaskTitle(taskTitle || null);
 
     const dur = getDurationForMode(mode);
     setTargetSeconds(dur);
@@ -159,20 +159,22 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setRemainingSeconds(dur);
     pausedRemainingRef.current = dur;
     setIsSessionComplete(false);
+    setActiveTaskId(null);
+    setActiveTaskTitle(null);
   };
 
   const addSeconds = (secs: number) => {
-    setTargetSeconds((prev) => prev + secs);
-    setRemainingSeconds((prev) => {
-      const next = prev + secs;
-      if (isRunning) {
-        pausedRemainingRef.current = next;
-        startTimeRef.current = Date.now();
-      } else {
-        pausedRemainingRef.current = next;
-      }
-      return next;
-    });
+    const currentRemaining =
+      isRunning && startTimeRef.current !== null
+        ? calculateRemainingSeconds(startTimeRef.current, pausedRemainingRef.current, Date.now())
+        : pausedRemainingRef.current;
+    const next = Math.max(0, currentRemaining + secs);
+    pausedRemainingRef.current = next;
+    if (isRunning) {
+      startTimeRef.current = Date.now();
+    }
+    setTargetSeconds((prev) => Math.max(1, prev + secs));
+    setRemainingSeconds(next);
   };
 
   const completeSessionNow = () => {
@@ -204,6 +206,8 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const dismissCompleteModal = () => {
     setIsSessionComplete(false);
+    setActiveTaskId(null);
+    setActiveTaskTitle(null);
     // Transition to appropriate next mode (e.g. break after focus)
     if (mode === 'focus') {
       switchMode('shortBreak');

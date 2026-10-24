@@ -44,6 +44,8 @@ interface TaskContextType {
   applyTemplate: (taskId: string, templateId: string) => void;
   setFocusPin: (taskId: string, isPinned: boolean) => void;
   reloadFromStorage: () => void;
+  persistenceError: string | null;
+  clearPersistenceError: () => void;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -54,13 +56,27 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [statusFilter, setStatusFilter] = useState<TaskStatusFilter>('all');
   const [priorityFilter, setPriorityFilter] = useState<TaskPriorityFilter>('all');
   const [sortOption, setSortOption] = useState<TaskSortOption>('recommended');
+  const [persistenceError, setPersistenceError] = useState<string | null>(null);
+
+  const clearPersistenceError = () => {
+    setPersistenceError(null);
+  };
 
   const persistTasks = (updater: Task[] | ((prev: Task[]) => Task[])) => {
     setTasks((prev) => {
       const next = typeof updater === 'function' ? updater(prev) : updater;
       const store = loadFromLocalStorage().store;
       store.tasks = next;
-      saveToLocalStorage(store);
+      const saveRes = saveToLocalStorage(store);
+      if (!saveRes.success) {
+        setPersistenceError(
+          saveRes.isQuotaExceeded
+            ? 'Storage quota exceeded — task changes cannot be saved to browser storage.'
+            : (saveRes.error || 'Failed to save task changes to browser storage.')
+        );
+      } else {
+        setPersistenceError(null);
+      }
       return next;
     });
   };
@@ -332,6 +348,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         applyTemplate,
         setFocusPin,
         reloadFromStorage,
+        persistenceError,
+        clearPersistenceError,
       }}
     >
       {children}

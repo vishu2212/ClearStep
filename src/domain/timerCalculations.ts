@@ -11,13 +11,17 @@ export function formatTimerDisplay(totalSeconds: number): string {
 /**
  * Calculates remaining seconds using wall-clock timestamp delta
  * to prevent background tab sleep/throttling drift.
+ * If startTimestamp is null or <= 0, returns the target duration directly.
  */
 export function calculateRemainingSeconds(
-  startTimestamp: number,
+  startTimestamp: number | null,
   targetDurationSeconds: number,
   currentTimestamp: number = Date.now()
 ): number {
-  const elapsedMs = currentTimestamp - startTimestamp;
+  if (startTimestamp === null || startTimestamp <= 0) {
+    return Math.max(0, targetDurationSeconds);
+  }
+  const elapsedMs = Math.max(0, currentTimestamp - startTimestamp);
   const elapsedSeconds = Math.max(0, Math.floor(elapsedMs / 1000));
   return Math.max(0, targetDurationSeconds - elapsedSeconds);
 }
