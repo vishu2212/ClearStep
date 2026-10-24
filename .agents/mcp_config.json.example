@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "gsd": {
+      "command": "node",
+      "args": [
+        "./.agents/gsd-core/bin/gsd-cli.cjs",
+        "mcp",
+        "--profile",
+        "default"
+      ]
+    },
+    "stitch": {
+      "serverUrl": "https://stitch.googleapis.com/mcp",
+      "headers": {
+        "X-Goog-Api-Key": "${STITCH_API_KEY:-YOUR_GCP_API_KEY}"
+      }
+    }
+  }
+}

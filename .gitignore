@@ -12,10 +12,12 @@ Thumbs.db
 !.vscode/extensions.json
 .idea/
 
-# Environment files
+# Environment & agent secrets
 .env
 .env.*
 !.env.example
+.agents/mcp_config.json
+!.agents/mcp_config.json.example
 
 # Temporary / testing
 coverage/

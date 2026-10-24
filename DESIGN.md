@@ -2,9 +2,9 @@
 
 **Product:** ClearStep  
 **Document:** `DESIGN.md`  
-**Version:** 1.0.0  
-**Design Status:** Approved  
-**Stitch MCP Integration Note:** The local Stitch MCP server schema was inspected at `C:\Users\VISHAV\.gemini\antigravity\mcp\stitch`, but the tool is currently unpermitted in this agent context (`server stitch is not allowed in this context`). Consequently, this comprehensive design contract serves as the canonical single source of truth for all visual tokens, screen layouts, component contracts, and accessibility criteria.
+**Version:** 1.1.0  
+**Design Status:** Approved & Synchronized with Stitch  
+**Stitch MCP Integration Note:** Connected to Google Stitch MCP at `https://stitch.googleapis.com/mcp`. The design system and core screens were retrieved from Stitch project `projects/14050010730948860372` (*"ClearStep Student Productivity Interface"*), including screens `98e884aa3bcb480c8f848ea8d83c3f62` (*"ClearStep — Today Dashboard"*) and `aaddb37de9bf40a9be7a568f7d0fd7a4` (*"ClearStep — Focus Mode"*). The tokens, layout structures, and signature motifs have been directly translated into the application.
 
 ---
 
